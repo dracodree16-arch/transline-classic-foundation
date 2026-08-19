@@ -14,6 +14,36 @@ export type Database = {
   }
   public: {
     Tables: {
+      audit_logs: {
+        Row: {
+          action: string
+          created_at: string
+          details: Json | null
+          entity_id: string | null
+          entity_type: string | null
+          id: string
+          user_id: string | null
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          details?: Json | null
+          entity_id?: string | null
+          entity_type?: string | null
+          id?: string
+          user_id?: string | null
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          details?: Json | null
+          entity_id?: string | null
+          entity_type?: string | null
+          id?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       bookings: {
         Row: {
           booked_by: string | null
@@ -111,6 +141,44 @@ export type Database = {
         }
         Relationships: []
       }
+      buses: {
+        Row: {
+          branch_id: string | null
+          capacity: number
+          created_at: string
+          id: string
+          model: string | null
+          plate_number: string
+          status: string
+        }
+        Insert: {
+          branch_id?: string | null
+          capacity?: number
+          created_at?: string
+          id?: string
+          model?: string | null
+          plate_number: string
+          status?: string
+        }
+        Update: {
+          branch_id?: string | null
+          capacity?: number
+          created_at?: string
+          id?: string
+          model?: string | null
+          plate_number?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "buses_branch_id_fkey"
+            columns: ["branch_id"]
+            isOneToOne: false
+            referencedRelation: "branches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       expenses: {
         Row: {
           amount: number
@@ -158,6 +226,36 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      notifications: {
+        Row: {
+          created_at: string
+          id: string
+          is_read: boolean
+          message: string | null
+          title: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          message?: string | null
+          title: string
+          type?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          message?: string | null
+          title?: string
+          type?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       parcels: {
         Row: {
@@ -240,6 +338,44 @@ export type Database = {
             columns: ["origin_branch_id"]
             isOneToOne: false
             referencedRelation: "branches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      passengers: {
+        Row: {
+          booking_id: string | null
+          created_at: string
+          full_name: string
+          id: string
+          id_number: string | null
+          phone: string | null
+          seat_number: string | null
+        }
+        Insert: {
+          booking_id?: string | null
+          created_at?: string
+          full_name: string
+          id?: string
+          id_number?: string | null
+          phone?: string | null
+          seat_number?: string | null
+        }
+        Update: {
+          booking_id?: string | null
+          created_at?: string
+          full_name?: string
+          id?: string
+          id_number?: string | null
+          phone?: string | null
+          seat_number?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "passengers_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
             referencedColumns: ["id"]
           },
         ]
@@ -401,6 +537,27 @@ export type Database = {
           },
         ]
       }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -418,8 +575,25 @@ export type Database = {
           seat_number: string
         }[]
       }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
+      is_staff_admin: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
+      app_role:
+        | "super_admin"
+        | "administrator"
+        | "manager"
+        | "booking_agent"
+        | "dispatcher"
+        | "parcel_staff"
+        | "finance_staff"
+        | "branch_staff"
       user_role: "admin" | "clerk"
     }
     CompositeTypes: {
@@ -548,6 +722,16 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      app_role: [
+        "super_admin",
+        "administrator",
+        "manager",
+        "booking_agent",
+        "dispatcher",
+        "parcel_staff",
+        "finance_staff",
+        "branch_staff",
+      ],
       user_role: ["admin", "clerk"],
     },
   },
