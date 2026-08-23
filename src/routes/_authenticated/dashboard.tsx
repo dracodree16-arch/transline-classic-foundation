@@ -152,7 +152,7 @@ function Dashboard() {
       <div className="grid gap-4 lg:grid-cols-3">
         {actionGroups.map((group) => (
           <SectionCard key={group.title} title={group.title}>
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-1">
               {group.actions.map((action) => (
                 <Link
                   key={action.label}
