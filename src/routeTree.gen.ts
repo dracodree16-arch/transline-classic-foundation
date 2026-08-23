@@ -10,11 +10,59 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedBookingsIndexRouteImport } from './routes/_authenticated/bookings.index'
+import { Route as AuthenticatedBookingsRefRouteImport } from './routes/_authenticated/bookings.$ref'
+import { Route as AuthenticatedBookingsDispatchRouteImport } from './routes/_authenticated/bookings.dispatch'
+import { Route as AuthenticatedBookingsManifestRouteImport } from './routes/_authenticated/bookings.manifest'
+import { Route as AuthenticatedBookingsNewRouteImport } from './routes/_authenticated/bookings.new'
+import { Route as AuthenticatedFinanceIndexRouteImport } from './routes/_authenticated/finance.index'
+import { Route as AuthenticatedFinanceBankingRouteImport } from './routes/_authenticated/finance.banking'
+import { Route as AuthenticatedFinanceCashForwardRouteImport } from './routes/_authenticated/finance.cash-forward'
+import { Route as AuthenticatedFinanceCashReceivedRouteImport } from './routes/_authenticated/finance.cash-received'
+import { Route as AuthenticatedFinanceExpensesRouteImport } from './routes/_authenticated/finance.expenses'
+import { Route as AuthenticatedFinanceMobileMoneyRouteImport } from './routes/_authenticated/finance.mobile-money'
+import { Route as AuthenticatedFinanceStatementsRouteImport } from './routes/_authenticated/finance.statements'
+import { Route as AuthenticatedFleetIndexRouteImport } from './routes/_authenticated/fleet.index'
+import { Route as AuthenticatedFleetIdRouteImport } from './routes/_authenticated/fleet.$id'
+import { Route as AuthenticatedFleetNewRouteImport } from './routes/_authenticated/fleet.new'
+import { Route as AuthenticatedParcelsIndexRouteImport } from './routes/_authenticated/parcels.index'
+import { Route as AuthenticatedParcelsCodeRouteImport } from './routes/_authenticated/parcels.$code'
+import { Route as AuthenticatedParcelsLoadingSheetRouteImport } from './routes/_authenticated/parcels.loading-sheet'
+import { Route as AuthenticatedParcelsNewRouteImport } from './routes/_authenticated/parcels.new'
+import { Route as AuthenticatedParcelsTrackingRouteImport } from './routes/_authenticated/parcels.tracking'
+import { Route as AuthenticatedReconciliationIndexRouteImport } from './routes/_authenticated/reconciliation.index'
+import { Route as AuthenticatedReconciliationIdRouteImport } from './routes/_authenticated/reconciliation.$id'
+import { Route as AuthenticatedReportsIndexRouteImport } from './routes/_authenticated/reports.index'
+import { Route as AuthenticatedReportsBranchesRouteImport } from './routes/_authenticated/reports.branches'
+import { Route as AuthenticatedReportsExpensesRouteImport } from './routes/_authenticated/reports.expenses'
+import { Route as AuthenticatedReportsParcelSalesRouteImport } from './routes/_authenticated/reports.parcel-sales'
+import { Route as AuthenticatedReportsRevenueRouteImport } from './routes/_authenticated/reports.revenue'
+import { Route as AuthenticatedReportsTicketSalesRouteImport } from './routes/_authenticated/reports.ticket-sales'
+import { Route as AuthenticatedRoutesIndexRouteImport } from './routes/_authenticated/routes.index'
+import { Route as AuthenticatedRoutesIdRouteImport } from './routes/_authenticated/routes.$id'
+import { Route as AuthenticatedRoutesNewRouteImport } from './routes/_authenticated/routes.new'
+import { Route as AuthenticatedSettingsIndexRouteImport } from './routes/_authenticated/settings.index'
+import { Route as AuthenticatedSettingsProfileRouteImport } from './routes/_authenticated/settings.profile'
+import { Route as AuthenticatedSettingsSystemRouteImport } from './routes/_authenticated/settings.system'
+import { Route as AuthenticatedStaffIndexRouteImport } from './routes/_authenticated/staff.index'
+import { Route as AuthenticatedStaffIdRouteImport } from './routes/_authenticated/staff.$id'
+import { Route as AuthenticatedStaffNewRouteImport } from './routes/_authenticated/staff.new'
+import { Route as AuthenticatedStaffRolesRouteImport } from './routes/_authenticated/staff.roles'
+import { Route as AuthenticatedTripsIndexRouteImport } from './routes/_authenticated/trips.index'
+import { Route as AuthenticatedTripsIdRouteImport } from './routes/_authenticated/trips.$id'
+import { Route as AuthenticatedTripsNewRouteImport } from './routes/_authenticated/trips.new'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -22,31 +70,543 @@ const AuthRoute = AuthRouteImport.update({
   path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedBookingsIndexRoute =
+  AuthenticatedBookingsIndexRouteImport.update({
+    id: '/bookings/',
+    path: '/bookings/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedBookingsRefRoute =
+  AuthenticatedBookingsRefRouteImport.update({
+    id: '/bookings/$ref',
+    path: '/bookings/$ref',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedBookingsDispatchRoute =
+  AuthenticatedBookingsDispatchRouteImport.update({
+    id: '/bookings/dispatch',
+    path: '/bookings/dispatch',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedBookingsManifestRoute =
+  AuthenticatedBookingsManifestRouteImport.update({
+    id: '/bookings/manifest',
+    path: '/bookings/manifest',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedBookingsNewRoute =
+  AuthenticatedBookingsNewRouteImport.update({
+    id: '/bookings/new',
+    path: '/bookings/new',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedFinanceIndexRoute =
+  AuthenticatedFinanceIndexRouteImport.update({
+    id: '/finance/',
+    path: '/finance/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedFinanceBankingRoute =
+  AuthenticatedFinanceBankingRouteImport.update({
+    id: '/finance/banking',
+    path: '/finance/banking',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedFinanceCashForwardRoute =
+  AuthenticatedFinanceCashForwardRouteImport.update({
+    id: '/finance/cash-forward',
+    path: '/finance/cash-forward',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedFinanceCashReceivedRoute =
+  AuthenticatedFinanceCashReceivedRouteImport.update({
+    id: '/finance/cash-received',
+    path: '/finance/cash-received',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedFinanceExpensesRoute =
+  AuthenticatedFinanceExpensesRouteImport.update({
+    id: '/finance/expenses',
+    path: '/finance/expenses',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedFinanceMobileMoneyRoute =
+  AuthenticatedFinanceMobileMoneyRouteImport.update({
+    id: '/finance/mobile-money',
+    path: '/finance/mobile-money',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedFinanceStatementsRoute =
+  AuthenticatedFinanceStatementsRouteImport.update({
+    id: '/finance/statements',
+    path: '/finance/statements',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedFleetIndexRoute = AuthenticatedFleetIndexRouteImport.update({
+  id: '/fleet/',
+  path: '/fleet/',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedFleetIdRoute = AuthenticatedFleetIdRouteImport.update({
+  id: '/fleet/$id',
+  path: '/fleet/$id',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedFleetNewRoute = AuthenticatedFleetNewRouteImport.update({
+  id: '/fleet/new',
+  path: '/fleet/new',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedParcelsIndexRoute =
+  AuthenticatedParcelsIndexRouteImport.update({
+    id: '/parcels/',
+    path: '/parcels/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedParcelsCodeRoute =
+  AuthenticatedParcelsCodeRouteImport.update({
+    id: '/parcels/$code',
+    path: '/parcels/$code',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedParcelsLoadingSheetRoute =
+  AuthenticatedParcelsLoadingSheetRouteImport.update({
+    id: '/parcels/loading-sheet',
+    path: '/parcels/loading-sheet',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedParcelsNewRoute = AuthenticatedParcelsNewRouteImport.update({
+  id: '/parcels/new',
+  path: '/parcels/new',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedParcelsTrackingRoute =
+  AuthenticatedParcelsTrackingRouteImport.update({
+    id: '/parcels/tracking',
+    path: '/parcels/tracking',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedReconciliationIndexRoute =
+  AuthenticatedReconciliationIndexRouteImport.update({
+    id: '/reconciliation/',
+    path: '/reconciliation/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedReconciliationIdRoute =
+  AuthenticatedReconciliationIdRouteImport.update({
+    id: '/reconciliation/$id',
+    path: '/reconciliation/$id',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedReportsIndexRoute =
+  AuthenticatedReportsIndexRouteImport.update({
+    id: '/reports/',
+    path: '/reports/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedReportsBranchesRoute =
+  AuthenticatedReportsBranchesRouteImport.update({
+    id: '/reports/branches',
+    path: '/reports/branches',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedReportsExpensesRoute =
+  AuthenticatedReportsExpensesRouteImport.update({
+    id: '/reports/expenses',
+    path: '/reports/expenses',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedReportsParcelSalesRoute =
+  AuthenticatedReportsParcelSalesRouteImport.update({
+    id: '/reports/parcel-sales',
+    path: '/reports/parcel-sales',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedReportsRevenueRoute =
+  AuthenticatedReportsRevenueRouteImport.update({
+    id: '/reports/revenue',
+    path: '/reports/revenue',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedReportsTicketSalesRoute =
+  AuthenticatedReportsTicketSalesRouteImport.update({
+    id: '/reports/ticket-sales',
+    path: '/reports/ticket-sales',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedRoutesIndexRoute =
+  AuthenticatedRoutesIndexRouteImport.update({
+    id: '/routes/',
+    path: '/routes/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedRoutesIdRoute = AuthenticatedRoutesIdRouteImport.update({
+  id: '/routes/$id',
+  path: '/routes/$id',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedRoutesNewRoute = AuthenticatedRoutesNewRouteImport.update({
+  id: '/routes/new',
+  path: '/routes/new',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedSettingsIndexRoute =
+  AuthenticatedSettingsIndexRouteImport.update({
+    id: '/settings/',
+    path: '/settings/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedSettingsProfileRoute =
+  AuthenticatedSettingsProfileRouteImport.update({
+    id: '/settings/profile',
+    path: '/settings/profile',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedSettingsSystemRoute =
+  AuthenticatedSettingsSystemRouteImport.update({
+    id: '/settings/system',
+    path: '/settings/system',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedStaffIndexRoute = AuthenticatedStaffIndexRouteImport.update({
+  id: '/staff/',
+  path: '/staff/',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedStaffIdRoute = AuthenticatedStaffIdRouteImport.update({
+  id: '/staff/$id',
+  path: '/staff/$id',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedStaffNewRoute = AuthenticatedStaffNewRouteImport.update({
+  id: '/staff/new',
+  path: '/staff/new',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedStaffRolesRoute = AuthenticatedStaffRolesRouteImport.update({
+  id: '/staff/roles',
+  path: '/staff/roles',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedTripsIndexRoute = AuthenticatedTripsIndexRouteImport.update({
+  id: '/trips/',
+  path: '/trips/',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedTripsIdRoute = AuthenticatedTripsIdRouteImport.update({
+  id: '/trips/$id',
+  path: '/trips/$id',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedTripsNewRoute = AuthenticatedTripsNewRouteImport.update({
+  id: '/trips/new',
+  path: '/trips/new',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
+  '/bookings/$ref': typeof AuthenticatedBookingsRefRoute
+  '/bookings/dispatch': typeof AuthenticatedBookingsDispatchRoute
+  '/bookings/manifest': typeof AuthenticatedBookingsManifestRoute
+  '/bookings/new': typeof AuthenticatedBookingsNewRoute
+  '/finance/banking': typeof AuthenticatedFinanceBankingRoute
+  '/finance/cash-forward': typeof AuthenticatedFinanceCashForwardRoute
+  '/finance/cash-received': typeof AuthenticatedFinanceCashReceivedRoute
+  '/finance/expenses': typeof AuthenticatedFinanceExpensesRoute
+  '/finance/mobile-money': typeof AuthenticatedFinanceMobileMoneyRoute
+  '/finance/statements': typeof AuthenticatedFinanceStatementsRoute
+  '/fleet/$id': typeof AuthenticatedFleetIdRoute
+  '/fleet/new': typeof AuthenticatedFleetNewRoute
+  '/parcels/$code': typeof AuthenticatedParcelsCodeRoute
+  '/parcels/loading-sheet': typeof AuthenticatedParcelsLoadingSheetRoute
+  '/parcels/new': typeof AuthenticatedParcelsNewRoute
+  '/parcels/tracking': typeof AuthenticatedParcelsTrackingRoute
+  '/reconciliation/$id': typeof AuthenticatedReconciliationIdRoute
+  '/reports/branches': typeof AuthenticatedReportsBranchesRoute
+  '/reports/expenses': typeof AuthenticatedReportsExpensesRoute
+  '/reports/parcel-sales': typeof AuthenticatedReportsParcelSalesRoute
+  '/reports/revenue': typeof AuthenticatedReportsRevenueRoute
+  '/reports/ticket-sales': typeof AuthenticatedReportsTicketSalesRoute
+  '/routes/$id': typeof AuthenticatedRoutesIdRoute
+  '/routes/new': typeof AuthenticatedRoutesNewRoute
+  '/settings/profile': typeof AuthenticatedSettingsProfileRoute
+  '/settings/system': typeof AuthenticatedSettingsSystemRoute
+  '/staff/$id': typeof AuthenticatedStaffIdRoute
+  '/staff/new': typeof AuthenticatedStaffNewRoute
+  '/staff/roles': typeof AuthenticatedStaffRolesRoute
+  '/trips/$id': typeof AuthenticatedTripsIdRoute
+  '/trips/new': typeof AuthenticatedTripsNewRoute
+  '/bookings/': typeof AuthenticatedBookingsIndexRoute
+  '/finance/': typeof AuthenticatedFinanceIndexRoute
+  '/fleet/': typeof AuthenticatedFleetIndexRoute
+  '/parcels/': typeof AuthenticatedParcelsIndexRoute
+  '/reconciliation/': typeof AuthenticatedReconciliationIndexRoute
+  '/reports/': typeof AuthenticatedReportsIndexRoute
+  '/routes/': typeof AuthenticatedRoutesIndexRoute
+  '/settings/': typeof AuthenticatedSettingsIndexRoute
+  '/staff/': typeof AuthenticatedStaffIndexRoute
+  '/trips/': typeof AuthenticatedTripsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
+  '/bookings/$ref': typeof AuthenticatedBookingsRefRoute
+  '/bookings/dispatch': typeof AuthenticatedBookingsDispatchRoute
+  '/bookings/manifest': typeof AuthenticatedBookingsManifestRoute
+  '/bookings/new': typeof AuthenticatedBookingsNewRoute
+  '/finance/banking': typeof AuthenticatedFinanceBankingRoute
+  '/finance/cash-forward': typeof AuthenticatedFinanceCashForwardRoute
+  '/finance/cash-received': typeof AuthenticatedFinanceCashReceivedRoute
+  '/finance/expenses': typeof AuthenticatedFinanceExpensesRoute
+  '/finance/mobile-money': typeof AuthenticatedFinanceMobileMoneyRoute
+  '/finance/statements': typeof AuthenticatedFinanceStatementsRoute
+  '/fleet/$id': typeof AuthenticatedFleetIdRoute
+  '/fleet/new': typeof AuthenticatedFleetNewRoute
+  '/parcels/$code': typeof AuthenticatedParcelsCodeRoute
+  '/parcels/loading-sheet': typeof AuthenticatedParcelsLoadingSheetRoute
+  '/parcels/new': typeof AuthenticatedParcelsNewRoute
+  '/parcels/tracking': typeof AuthenticatedParcelsTrackingRoute
+  '/reconciliation/$id': typeof AuthenticatedReconciliationIdRoute
+  '/reports/branches': typeof AuthenticatedReportsBranchesRoute
+  '/reports/expenses': typeof AuthenticatedReportsExpensesRoute
+  '/reports/parcel-sales': typeof AuthenticatedReportsParcelSalesRoute
+  '/reports/revenue': typeof AuthenticatedReportsRevenueRoute
+  '/reports/ticket-sales': typeof AuthenticatedReportsTicketSalesRoute
+  '/routes/$id': typeof AuthenticatedRoutesIdRoute
+  '/routes/new': typeof AuthenticatedRoutesNewRoute
+  '/settings/profile': typeof AuthenticatedSettingsProfileRoute
+  '/settings/system': typeof AuthenticatedSettingsSystemRoute
+  '/staff/$id': typeof AuthenticatedStaffIdRoute
+  '/staff/new': typeof AuthenticatedStaffNewRoute
+  '/staff/roles': typeof AuthenticatedStaffRolesRoute
+  '/trips/$id': typeof AuthenticatedTripsIdRoute
+  '/trips/new': typeof AuthenticatedTripsNewRoute
+  '/bookings': typeof AuthenticatedBookingsIndexRoute
+  '/finance': typeof AuthenticatedFinanceIndexRoute
+  '/fleet': typeof AuthenticatedFleetIndexRoute
+  '/parcels': typeof AuthenticatedParcelsIndexRoute
+  '/reconciliation': typeof AuthenticatedReconciliationIndexRoute
+  '/reports': typeof AuthenticatedReportsIndexRoute
+  '/routes': typeof AuthenticatedRoutesIndexRoute
+  '/settings': typeof AuthenticatedSettingsIndexRoute
+  '/staff': typeof AuthenticatedStaffIndexRoute
+  '/trips': typeof AuthenticatedTripsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/bookings/$ref': typeof AuthenticatedBookingsRefRoute
+  '/_authenticated/bookings/dispatch': typeof AuthenticatedBookingsDispatchRoute
+  '/_authenticated/bookings/manifest': typeof AuthenticatedBookingsManifestRoute
+  '/_authenticated/bookings/new': typeof AuthenticatedBookingsNewRoute
+  '/_authenticated/finance/banking': typeof AuthenticatedFinanceBankingRoute
+  '/_authenticated/finance/cash-forward': typeof AuthenticatedFinanceCashForwardRoute
+  '/_authenticated/finance/cash-received': typeof AuthenticatedFinanceCashReceivedRoute
+  '/_authenticated/finance/expenses': typeof AuthenticatedFinanceExpensesRoute
+  '/_authenticated/finance/mobile-money': typeof AuthenticatedFinanceMobileMoneyRoute
+  '/_authenticated/finance/statements': typeof AuthenticatedFinanceStatementsRoute
+  '/_authenticated/fleet/$id': typeof AuthenticatedFleetIdRoute
+  '/_authenticated/fleet/new': typeof AuthenticatedFleetNewRoute
+  '/_authenticated/parcels/$code': typeof AuthenticatedParcelsCodeRoute
+  '/_authenticated/parcels/loading-sheet': typeof AuthenticatedParcelsLoadingSheetRoute
+  '/_authenticated/parcels/new': typeof AuthenticatedParcelsNewRoute
+  '/_authenticated/parcels/tracking': typeof AuthenticatedParcelsTrackingRoute
+  '/_authenticated/reconciliation/$id': typeof AuthenticatedReconciliationIdRoute
+  '/_authenticated/reports/branches': typeof AuthenticatedReportsBranchesRoute
+  '/_authenticated/reports/expenses': typeof AuthenticatedReportsExpensesRoute
+  '/_authenticated/reports/parcel-sales': typeof AuthenticatedReportsParcelSalesRoute
+  '/_authenticated/reports/revenue': typeof AuthenticatedReportsRevenueRoute
+  '/_authenticated/reports/ticket-sales': typeof AuthenticatedReportsTicketSalesRoute
+  '/_authenticated/routes/$id': typeof AuthenticatedRoutesIdRoute
+  '/_authenticated/routes/new': typeof AuthenticatedRoutesNewRoute
+  '/_authenticated/settings/profile': typeof AuthenticatedSettingsProfileRoute
+  '/_authenticated/settings/system': typeof AuthenticatedSettingsSystemRoute
+  '/_authenticated/staff/$id': typeof AuthenticatedStaffIdRoute
+  '/_authenticated/staff/new': typeof AuthenticatedStaffNewRoute
+  '/_authenticated/staff/roles': typeof AuthenticatedStaffRolesRoute
+  '/_authenticated/trips/$id': typeof AuthenticatedTripsIdRoute
+  '/_authenticated/trips/new': typeof AuthenticatedTripsNewRoute
+  '/_authenticated/bookings/': typeof AuthenticatedBookingsIndexRoute
+  '/_authenticated/finance/': typeof AuthenticatedFinanceIndexRoute
+  '/_authenticated/fleet/': typeof AuthenticatedFleetIndexRoute
+  '/_authenticated/parcels/': typeof AuthenticatedParcelsIndexRoute
+  '/_authenticated/reconciliation/': typeof AuthenticatedReconciliationIndexRoute
+  '/_authenticated/reports/': typeof AuthenticatedReportsIndexRoute
+  '/_authenticated/routes/': typeof AuthenticatedRoutesIndexRoute
+  '/_authenticated/settings/': typeof AuthenticatedSettingsIndexRoute
+  '/_authenticated/staff/': typeof AuthenticatedStaffIndexRoute
+  '/_authenticated/trips/': typeof AuthenticatedTripsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/reset-password'
+    | '/dashboard'
+    | '/bookings/$ref'
+    | '/bookings/dispatch'
+    | '/bookings/manifest'
+    | '/bookings/new'
+    | '/finance/banking'
+    | '/finance/cash-forward'
+    | '/finance/cash-received'
+    | '/finance/expenses'
+    | '/finance/mobile-money'
+    | '/finance/statements'
+    | '/fleet/$id'
+    | '/fleet/new'
+    | '/parcels/$code'
+    | '/parcels/loading-sheet'
+    | '/parcels/new'
+    | '/parcels/tracking'
+    | '/reconciliation/$id'
+    | '/reports/branches'
+    | '/reports/expenses'
+    | '/reports/parcel-sales'
+    | '/reports/revenue'
+    | '/reports/ticket-sales'
+    | '/routes/$id'
+    | '/routes/new'
+    | '/settings/profile'
+    | '/settings/system'
+    | '/staff/$id'
+    | '/staff/new'
+    | '/staff/roles'
+    | '/trips/$id'
+    | '/trips/new'
+    | '/bookings/'
+    | '/finance/'
+    | '/fleet/'
+    | '/parcels/'
+    | '/reconciliation/'
+    | '/reports/'
+    | '/routes/'
+    | '/settings/'
+    | '/staff/'
+    | '/trips/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth'
-  id: '__root__' | '/' | '/auth'
+  to:
+    | '/'
+    | '/auth'
+    | '/reset-password'
+    | '/dashboard'
+    | '/bookings/$ref'
+    | '/bookings/dispatch'
+    | '/bookings/manifest'
+    | '/bookings/new'
+    | '/finance/banking'
+    | '/finance/cash-forward'
+    | '/finance/cash-received'
+    | '/finance/expenses'
+    | '/finance/mobile-money'
+    | '/finance/statements'
+    | '/fleet/$id'
+    | '/fleet/new'
+    | '/parcels/$code'
+    | '/parcels/loading-sheet'
+    | '/parcels/new'
+    | '/parcels/tracking'
+    | '/reconciliation/$id'
+    | '/reports/branches'
+    | '/reports/expenses'
+    | '/reports/parcel-sales'
+    | '/reports/revenue'
+    | '/reports/ticket-sales'
+    | '/routes/$id'
+    | '/routes/new'
+    | '/settings/profile'
+    | '/settings/system'
+    | '/staff/$id'
+    | '/staff/new'
+    | '/staff/roles'
+    | '/trips/$id'
+    | '/trips/new'
+    | '/bookings'
+    | '/finance'
+    | '/fleet'
+    | '/parcels'
+    | '/reconciliation'
+    | '/reports'
+    | '/routes'
+    | '/settings'
+    | '/staff'
+    | '/trips'
+  id:
+    | '__root__'
+    | '/'
+    | '/_authenticated'
+    | '/auth'
+    | '/reset-password'
+    | '/_authenticated/dashboard'
+    | '/_authenticated/bookings/$ref'
+    | '/_authenticated/bookings/dispatch'
+    | '/_authenticated/bookings/manifest'
+    | '/_authenticated/bookings/new'
+    | '/_authenticated/finance/banking'
+    | '/_authenticated/finance/cash-forward'
+    | '/_authenticated/finance/cash-received'
+    | '/_authenticated/finance/expenses'
+    | '/_authenticated/finance/mobile-money'
+    | '/_authenticated/finance/statements'
+    | '/_authenticated/fleet/$id'
+    | '/_authenticated/fleet/new'
+    | '/_authenticated/parcels/$code'
+    | '/_authenticated/parcels/loading-sheet'
+    | '/_authenticated/parcels/new'
+    | '/_authenticated/parcels/tracking'
+    | '/_authenticated/reconciliation/$id'
+    | '/_authenticated/reports/branches'
+    | '/_authenticated/reports/expenses'
+    | '/_authenticated/reports/parcel-sales'
+    | '/_authenticated/reports/revenue'
+    | '/_authenticated/reports/ticket-sales'
+    | '/_authenticated/routes/$id'
+    | '/_authenticated/routes/new'
+    | '/_authenticated/settings/profile'
+    | '/_authenticated/settings/system'
+    | '/_authenticated/staff/$id'
+    | '/_authenticated/staff/new'
+    | '/_authenticated/staff/roles'
+    | '/_authenticated/trips/$id'
+    | '/_authenticated/trips/new'
+    | '/_authenticated/bookings/'
+    | '/_authenticated/finance/'
+    | '/_authenticated/fleet/'
+    | '/_authenticated/parcels/'
+    | '/_authenticated/reconciliation/'
+    | '/_authenticated/reports/'
+    | '/_authenticated/routes/'
+    | '/_authenticated/settings/'
+    | '/_authenticated/staff/'
+    | '/_authenticated/trips/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -58,6 +618,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/auth': {
       id: '/auth'
       path: '/auth'
@@ -65,12 +632,408 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/dashboard': {
+      id: '/_authenticated/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AuthenticatedDashboardRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/bookings/': {
+      id: '/_authenticated/bookings/'
+      path: '/bookings'
+      fullPath: '/bookings/'
+      preLoaderRoute: typeof AuthenticatedBookingsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/bookings/$ref': {
+      id: '/_authenticated/bookings/$ref'
+      path: '/bookings/$ref'
+      fullPath: '/bookings/$ref'
+      preLoaderRoute: typeof AuthenticatedBookingsRefRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/bookings/dispatch': {
+      id: '/_authenticated/bookings/dispatch'
+      path: '/bookings/dispatch'
+      fullPath: '/bookings/dispatch'
+      preLoaderRoute: typeof AuthenticatedBookingsDispatchRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/bookings/manifest': {
+      id: '/_authenticated/bookings/manifest'
+      path: '/bookings/manifest'
+      fullPath: '/bookings/manifest'
+      preLoaderRoute: typeof AuthenticatedBookingsManifestRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/bookings/new': {
+      id: '/_authenticated/bookings/new'
+      path: '/bookings/new'
+      fullPath: '/bookings/new'
+      preLoaderRoute: typeof AuthenticatedBookingsNewRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/finance/': {
+      id: '/_authenticated/finance/'
+      path: '/finance'
+      fullPath: '/finance/'
+      preLoaderRoute: typeof AuthenticatedFinanceIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/finance/banking': {
+      id: '/_authenticated/finance/banking'
+      path: '/finance/banking'
+      fullPath: '/finance/banking'
+      preLoaderRoute: typeof AuthenticatedFinanceBankingRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/finance/cash-forward': {
+      id: '/_authenticated/finance/cash-forward'
+      path: '/finance/cash-forward'
+      fullPath: '/finance/cash-forward'
+      preLoaderRoute: typeof AuthenticatedFinanceCashForwardRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/finance/cash-received': {
+      id: '/_authenticated/finance/cash-received'
+      path: '/finance/cash-received'
+      fullPath: '/finance/cash-received'
+      preLoaderRoute: typeof AuthenticatedFinanceCashReceivedRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/finance/expenses': {
+      id: '/_authenticated/finance/expenses'
+      path: '/finance/expenses'
+      fullPath: '/finance/expenses'
+      preLoaderRoute: typeof AuthenticatedFinanceExpensesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/finance/mobile-money': {
+      id: '/_authenticated/finance/mobile-money'
+      path: '/finance/mobile-money'
+      fullPath: '/finance/mobile-money'
+      preLoaderRoute: typeof AuthenticatedFinanceMobileMoneyRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/finance/statements': {
+      id: '/_authenticated/finance/statements'
+      path: '/finance/statements'
+      fullPath: '/finance/statements'
+      preLoaderRoute: typeof AuthenticatedFinanceStatementsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/fleet/': {
+      id: '/_authenticated/fleet/'
+      path: '/fleet'
+      fullPath: '/fleet/'
+      preLoaderRoute: typeof AuthenticatedFleetIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/fleet/$id': {
+      id: '/_authenticated/fleet/$id'
+      path: '/fleet/$id'
+      fullPath: '/fleet/$id'
+      preLoaderRoute: typeof AuthenticatedFleetIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/fleet/new': {
+      id: '/_authenticated/fleet/new'
+      path: '/fleet/new'
+      fullPath: '/fleet/new'
+      preLoaderRoute: typeof AuthenticatedFleetNewRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/parcels/': {
+      id: '/_authenticated/parcels/'
+      path: '/parcels'
+      fullPath: '/parcels/'
+      preLoaderRoute: typeof AuthenticatedParcelsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/parcels/$code': {
+      id: '/_authenticated/parcels/$code'
+      path: '/parcels/$code'
+      fullPath: '/parcels/$code'
+      preLoaderRoute: typeof AuthenticatedParcelsCodeRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/parcels/loading-sheet': {
+      id: '/_authenticated/parcels/loading-sheet'
+      path: '/parcels/loading-sheet'
+      fullPath: '/parcels/loading-sheet'
+      preLoaderRoute: typeof AuthenticatedParcelsLoadingSheetRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/parcels/new': {
+      id: '/_authenticated/parcels/new'
+      path: '/parcels/new'
+      fullPath: '/parcels/new'
+      preLoaderRoute: typeof AuthenticatedParcelsNewRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/parcels/tracking': {
+      id: '/_authenticated/parcels/tracking'
+      path: '/parcels/tracking'
+      fullPath: '/parcels/tracking'
+      preLoaderRoute: typeof AuthenticatedParcelsTrackingRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/reconciliation/': {
+      id: '/_authenticated/reconciliation/'
+      path: '/reconciliation'
+      fullPath: '/reconciliation/'
+      preLoaderRoute: typeof AuthenticatedReconciliationIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/reconciliation/$id': {
+      id: '/_authenticated/reconciliation/$id'
+      path: '/reconciliation/$id'
+      fullPath: '/reconciliation/$id'
+      preLoaderRoute: typeof AuthenticatedReconciliationIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/reports/': {
+      id: '/_authenticated/reports/'
+      path: '/reports'
+      fullPath: '/reports/'
+      preLoaderRoute: typeof AuthenticatedReportsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/reports/branches': {
+      id: '/_authenticated/reports/branches'
+      path: '/reports/branches'
+      fullPath: '/reports/branches'
+      preLoaderRoute: typeof AuthenticatedReportsBranchesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/reports/expenses': {
+      id: '/_authenticated/reports/expenses'
+      path: '/reports/expenses'
+      fullPath: '/reports/expenses'
+      preLoaderRoute: typeof AuthenticatedReportsExpensesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/reports/parcel-sales': {
+      id: '/_authenticated/reports/parcel-sales'
+      path: '/reports/parcel-sales'
+      fullPath: '/reports/parcel-sales'
+      preLoaderRoute: typeof AuthenticatedReportsParcelSalesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/reports/revenue': {
+      id: '/_authenticated/reports/revenue'
+      path: '/reports/revenue'
+      fullPath: '/reports/revenue'
+      preLoaderRoute: typeof AuthenticatedReportsRevenueRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/reports/ticket-sales': {
+      id: '/_authenticated/reports/ticket-sales'
+      path: '/reports/ticket-sales'
+      fullPath: '/reports/ticket-sales'
+      preLoaderRoute: typeof AuthenticatedReportsTicketSalesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/routes/': {
+      id: '/_authenticated/routes/'
+      path: '/routes'
+      fullPath: '/routes/'
+      preLoaderRoute: typeof AuthenticatedRoutesIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/routes/$id': {
+      id: '/_authenticated/routes/$id'
+      path: '/routes/$id'
+      fullPath: '/routes/$id'
+      preLoaderRoute: typeof AuthenticatedRoutesIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/routes/new': {
+      id: '/_authenticated/routes/new'
+      path: '/routes/new'
+      fullPath: '/routes/new'
+      preLoaderRoute: typeof AuthenticatedRoutesNewRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/settings/': {
+      id: '/_authenticated/settings/'
+      path: '/settings'
+      fullPath: '/settings/'
+      preLoaderRoute: typeof AuthenticatedSettingsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/settings/profile': {
+      id: '/_authenticated/settings/profile'
+      path: '/settings/profile'
+      fullPath: '/settings/profile'
+      preLoaderRoute: typeof AuthenticatedSettingsProfileRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/settings/system': {
+      id: '/_authenticated/settings/system'
+      path: '/settings/system'
+      fullPath: '/settings/system'
+      preLoaderRoute: typeof AuthenticatedSettingsSystemRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/staff/': {
+      id: '/_authenticated/staff/'
+      path: '/staff'
+      fullPath: '/staff/'
+      preLoaderRoute: typeof AuthenticatedStaffIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/staff/$id': {
+      id: '/_authenticated/staff/$id'
+      path: '/staff/$id'
+      fullPath: '/staff/$id'
+      preLoaderRoute: typeof AuthenticatedStaffIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/staff/new': {
+      id: '/_authenticated/staff/new'
+      path: '/staff/new'
+      fullPath: '/staff/new'
+      preLoaderRoute: typeof AuthenticatedStaffNewRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/staff/roles': {
+      id: '/_authenticated/staff/roles'
+      path: '/staff/roles'
+      fullPath: '/staff/roles'
+      preLoaderRoute: typeof AuthenticatedStaffRolesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/trips/': {
+      id: '/_authenticated/trips/'
+      path: '/trips'
+      fullPath: '/trips/'
+      preLoaderRoute: typeof AuthenticatedTripsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/trips/$id': {
+      id: '/_authenticated/trips/$id'
+      path: '/trips/$id'
+      fullPath: '/trips/$id'
+      preLoaderRoute: typeof AuthenticatedTripsIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/trips/new': {
+      id: '/_authenticated/trips/new'
+      path: '/trips/new'
+      fullPath: '/trips/new'
+      preLoaderRoute: typeof AuthenticatedTripsNewRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedBookingsRefRoute: typeof AuthenticatedBookingsRefRoute
+  AuthenticatedBookingsDispatchRoute: typeof AuthenticatedBookingsDispatchRoute
+  AuthenticatedBookingsManifestRoute: typeof AuthenticatedBookingsManifestRoute
+  AuthenticatedBookingsNewRoute: typeof AuthenticatedBookingsNewRoute
+  AuthenticatedFinanceBankingRoute: typeof AuthenticatedFinanceBankingRoute
+  AuthenticatedFinanceCashForwardRoute: typeof AuthenticatedFinanceCashForwardRoute
+  AuthenticatedFinanceCashReceivedRoute: typeof AuthenticatedFinanceCashReceivedRoute
+  AuthenticatedFinanceExpensesRoute: typeof AuthenticatedFinanceExpensesRoute
+  AuthenticatedFinanceMobileMoneyRoute: typeof AuthenticatedFinanceMobileMoneyRoute
+  AuthenticatedFinanceStatementsRoute: typeof AuthenticatedFinanceStatementsRoute
+  AuthenticatedFleetIdRoute: typeof AuthenticatedFleetIdRoute
+  AuthenticatedFleetNewRoute: typeof AuthenticatedFleetNewRoute
+  AuthenticatedParcelsCodeRoute: typeof AuthenticatedParcelsCodeRoute
+  AuthenticatedParcelsLoadingSheetRoute: typeof AuthenticatedParcelsLoadingSheetRoute
+  AuthenticatedParcelsNewRoute: typeof AuthenticatedParcelsNewRoute
+  AuthenticatedParcelsTrackingRoute: typeof AuthenticatedParcelsTrackingRoute
+  AuthenticatedReconciliationIdRoute: typeof AuthenticatedReconciliationIdRoute
+  AuthenticatedReportsBranchesRoute: typeof AuthenticatedReportsBranchesRoute
+  AuthenticatedReportsExpensesRoute: typeof AuthenticatedReportsExpensesRoute
+  AuthenticatedReportsParcelSalesRoute: typeof AuthenticatedReportsParcelSalesRoute
+  AuthenticatedReportsRevenueRoute: typeof AuthenticatedReportsRevenueRoute
+  AuthenticatedReportsTicketSalesRoute: typeof AuthenticatedReportsTicketSalesRoute
+  AuthenticatedRoutesIdRoute: typeof AuthenticatedRoutesIdRoute
+  AuthenticatedRoutesNewRoute: typeof AuthenticatedRoutesNewRoute
+  AuthenticatedSettingsProfileRoute: typeof AuthenticatedSettingsProfileRoute
+  AuthenticatedSettingsSystemRoute: typeof AuthenticatedSettingsSystemRoute
+  AuthenticatedStaffIdRoute: typeof AuthenticatedStaffIdRoute
+  AuthenticatedStaffNewRoute: typeof AuthenticatedStaffNewRoute
+  AuthenticatedStaffRolesRoute: typeof AuthenticatedStaffRolesRoute
+  AuthenticatedTripsIdRoute: typeof AuthenticatedTripsIdRoute
+  AuthenticatedTripsNewRoute: typeof AuthenticatedTripsNewRoute
+  AuthenticatedBookingsIndexRoute: typeof AuthenticatedBookingsIndexRoute
+  AuthenticatedFinanceIndexRoute: typeof AuthenticatedFinanceIndexRoute
+  AuthenticatedFleetIndexRoute: typeof AuthenticatedFleetIndexRoute
+  AuthenticatedParcelsIndexRoute: typeof AuthenticatedParcelsIndexRoute
+  AuthenticatedReconciliationIndexRoute: typeof AuthenticatedReconciliationIndexRoute
+  AuthenticatedReportsIndexRoute: typeof AuthenticatedReportsIndexRoute
+  AuthenticatedRoutesIndexRoute: typeof AuthenticatedRoutesIndexRoute
+  AuthenticatedSettingsIndexRoute: typeof AuthenticatedSettingsIndexRoute
+  AuthenticatedStaffIndexRoute: typeof AuthenticatedStaffIndexRoute
+  AuthenticatedTripsIndexRoute: typeof AuthenticatedTripsIndexRoute
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedBookingsRefRoute: AuthenticatedBookingsRefRoute,
+  AuthenticatedBookingsDispatchRoute: AuthenticatedBookingsDispatchRoute,
+  AuthenticatedBookingsManifestRoute: AuthenticatedBookingsManifestRoute,
+  AuthenticatedBookingsNewRoute: AuthenticatedBookingsNewRoute,
+  AuthenticatedFinanceBankingRoute: AuthenticatedFinanceBankingRoute,
+  AuthenticatedFinanceCashForwardRoute: AuthenticatedFinanceCashForwardRoute,
+  AuthenticatedFinanceCashReceivedRoute: AuthenticatedFinanceCashReceivedRoute,
+  AuthenticatedFinanceExpensesRoute: AuthenticatedFinanceExpensesRoute,
+  AuthenticatedFinanceMobileMoneyRoute: AuthenticatedFinanceMobileMoneyRoute,
+  AuthenticatedFinanceStatementsRoute: AuthenticatedFinanceStatementsRoute,
+  AuthenticatedFleetIdRoute: AuthenticatedFleetIdRoute,
+  AuthenticatedFleetNewRoute: AuthenticatedFleetNewRoute,
+  AuthenticatedParcelsCodeRoute: AuthenticatedParcelsCodeRoute,
+  AuthenticatedParcelsLoadingSheetRoute: AuthenticatedParcelsLoadingSheetRoute,
+  AuthenticatedParcelsNewRoute: AuthenticatedParcelsNewRoute,
+  AuthenticatedParcelsTrackingRoute: AuthenticatedParcelsTrackingRoute,
+  AuthenticatedReconciliationIdRoute: AuthenticatedReconciliationIdRoute,
+  AuthenticatedReportsBranchesRoute: AuthenticatedReportsBranchesRoute,
+  AuthenticatedReportsExpensesRoute: AuthenticatedReportsExpensesRoute,
+  AuthenticatedReportsParcelSalesRoute: AuthenticatedReportsParcelSalesRoute,
+  AuthenticatedReportsRevenueRoute: AuthenticatedReportsRevenueRoute,
+  AuthenticatedReportsTicketSalesRoute: AuthenticatedReportsTicketSalesRoute,
+  AuthenticatedRoutesIdRoute: AuthenticatedRoutesIdRoute,
+  AuthenticatedRoutesNewRoute: AuthenticatedRoutesNewRoute,
+  AuthenticatedSettingsProfileRoute: AuthenticatedSettingsProfileRoute,
+  AuthenticatedSettingsSystemRoute: AuthenticatedSettingsSystemRoute,
+  AuthenticatedStaffIdRoute: AuthenticatedStaffIdRoute,
+  AuthenticatedStaffNewRoute: AuthenticatedStaffNewRoute,
+  AuthenticatedStaffRolesRoute: AuthenticatedStaffRolesRoute,
+  AuthenticatedTripsIdRoute: AuthenticatedTripsIdRoute,
+  AuthenticatedTripsNewRoute: AuthenticatedTripsNewRoute,
+  AuthenticatedBookingsIndexRoute: AuthenticatedBookingsIndexRoute,
+  AuthenticatedFinanceIndexRoute: AuthenticatedFinanceIndexRoute,
+  AuthenticatedFleetIndexRoute: AuthenticatedFleetIndexRoute,
+  AuthenticatedParcelsIndexRoute: AuthenticatedParcelsIndexRoute,
+  AuthenticatedReconciliationIndexRoute: AuthenticatedReconciliationIndexRoute,
+  AuthenticatedReportsIndexRoute: AuthenticatedReportsIndexRoute,
+  AuthenticatedRoutesIndexRoute: AuthenticatedRoutesIndexRoute,
+  AuthenticatedSettingsIndexRoute: AuthenticatedSettingsIndexRoute,
+  AuthenticatedStaffIndexRoute: AuthenticatedStaffIndexRoute,
+  AuthenticatedTripsIndexRoute: AuthenticatedTripsIndexRoute,
+}
+
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

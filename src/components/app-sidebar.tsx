@@ -69,7 +69,7 @@ export function AppSidebar() {
                           {item.children.map((child) => (
                             <SidebarMenuSubItem key={child.url}>
                               <SidebarMenuSubButton asChild isActive={pathname === child.url}>
-                                <Link to={child.url}>{child.title}</Link>
+                                <Link to={child.url as "/dashboard"}>{child.title}</Link>
                               </SidebarMenuSubButton>
                             </SidebarMenuSubItem>
                           ))}
@@ -80,7 +80,7 @@ export function AppSidebar() {
                 ) : (
                   <SidebarMenuItem key={item.title}>
                     <SidebarMenuButton asChild isActive={isActive(item.url)} tooltip={item.title}>
-                      <Link to={item.url}>
+                      <Link to={item.url as "/dashboard"}>
                         <item.icon className="size-4" />
                         <span>{item.title}</span>
                       </Link>
