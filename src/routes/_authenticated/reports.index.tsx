@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Page, SectionCard, DemoNotice } from "@/components/page-shell";
 
-export const Route = createFileRoute("/_authenticated/reports")({
+export const Route = createFileRoute("/_authenticated/reports/")({
   head: () => ({
     meta: [
       { title: "Reports | Transline Classic TMS" },

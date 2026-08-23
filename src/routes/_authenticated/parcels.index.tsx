@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { KES, parcels } from "@/lib/demo-data";
 import { Page, SectionCard, DemoNotice } from "@/components/page-shell";
 
-export const Route = createFileRoute("/_authenticated/parcels")({
+export const Route = createFileRoute("/_authenticated/parcels/")({
   head: () => ({
     meta: [
       { title: "All Parcels | Transline Classic TMS" },

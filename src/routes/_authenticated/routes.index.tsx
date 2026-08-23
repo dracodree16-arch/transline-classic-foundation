@@ -3,7 +3,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { KES, routes } from "@/lib/demo-data";
 import { Page, SectionCard, DemoNotice } from "@/components/page-shell";
 
-export const Route = createFileRoute("/_authenticated/routes")({
+export const Route = createFileRoute("/_authenticated/routes/")({
   head: () => ({
     meta: [
       { title: "All Routes | Transline Classic TMS" },

@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { KES } from "@/lib/demo-data";
 import { Page, SectionCard, DemoNotice } from "@/components/page-shell";
 
-export const Route = createFileRoute("/_authenticated/finance")({
+export const Route = createFileRoute("/_authenticated/finance/")({
   head: () => ({
     meta: [
       { title: "Financial Overview | Transline Classic TMS" },

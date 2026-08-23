@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { buses } from "@/lib/demo-data";
 import { Page, SectionCard, DemoNotice } from "@/components/page-shell";
 
-export const Route = createFileRoute("/_authenticated/fleet")({
+export const Route = createFileRoute("/_authenticated/fleet/")({
   head: () => ({
     meta: [
       { title: "Fleet — All Buses | Transline Classic TMS" },

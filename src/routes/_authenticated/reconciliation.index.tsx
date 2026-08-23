@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { KES } from "@/lib/demo-data";
 import { Page, SectionCard, DemoNotice } from "@/components/page-shell";
 
-export const Route = createFileRoute("/_authenticated/reconciliation")({
+export const Route = createFileRoute("/_authenticated/reconciliation/")({
   head: () => ({
     meta: [
       { title: "Reconciliation Dashboard | Transline Classic TMS" },

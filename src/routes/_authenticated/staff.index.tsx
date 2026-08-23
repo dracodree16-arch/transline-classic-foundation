@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { staff } from "@/lib/demo-data";
 import { Page, SectionCard, DemoNotice } from "@/components/page-shell";
 
-export const Route = createFileRoute("/_authenticated/staff")({
+export const Route = createFileRoute("/_authenticated/staff/")({
   head: () => ({
     meta: [
       { title: "Staff List | Transline Classic TMS" },
