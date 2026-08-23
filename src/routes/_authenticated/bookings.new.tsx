@@ -118,7 +118,7 @@ function BookingsNewPage() {
     }
   }, [selectedTripId]);
 
-  async function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: { preventDefault: () => void })  {
     e.preventDefault();
 
     if (!selectedTripId) return toast.error("Select a trip first.");
