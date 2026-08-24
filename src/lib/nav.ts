@@ -16,7 +16,8 @@ export type NavItem = {
   title: string;
   url: string;
   icon: typeof LayoutDashboard;
-  children?: { title: string; url: string }[];
+  adminOnly?: boolean;
+  children?: { title: string; url: string; adminOnly?: boolean }[];
 };
 
 export const navItems: NavItem[] = [
