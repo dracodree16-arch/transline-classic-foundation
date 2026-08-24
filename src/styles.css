@@ -96,6 +96,14 @@
   --destructive: oklch(0.577 0.245 27.325);
   --destructive-foreground: oklch(0.985 0.005 285);
   --success: oklch(0.62 0.15 155);
+  --seat-available: oklch(0.75 0.16 152);
+  --seat-available-foreground: oklch(0.24 0.07 152);
+  --seat-booked: oklch(0.6 0.21 25);
+  --seat-booked-foreground: oklch(0.99 0.01 25);
+  --seat-selected: oklch(0.52 0.18 258);
+  --seat-selected-foreground: oklch(0.99 0.01 258);
+  --seat-blocked: oklch(0.86 0.008 286);
+  --seat-blocked-foreground: oklch(0.55 0.02 286);
   --warning: oklch(0.75 0.15 78);
   --border: oklch(0.915 0.012 286);
   --input: oklch(0.915 0.012 286);
