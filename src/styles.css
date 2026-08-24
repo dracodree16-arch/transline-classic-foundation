@@ -62,6 +62,14 @@
   --color-primary-glow: var(--primary-glow);
   --color-success: var(--success);
   --color-warning: var(--warning);
+  --color-seat-available: var(--seat-available);
+  --color-seat-available-foreground: var(--seat-available-foreground);
+  --color-seat-booked: var(--seat-booked);
+  --color-seat-booked-foreground: var(--seat-booked-foreground);
+  --color-seat-selected: var(--seat-selected);
+  --color-seat-selected-foreground: var(--seat-selected-foreground);
+  --color-seat-blocked: var(--seat-blocked);
+  --color-seat-blocked-foreground: var(--seat-blocked-foreground);
   --font-sans: var(--font-sans);
   --shadow-card: var(--shadow-card);
   --shadow-elevated: var(--shadow-elevated);
