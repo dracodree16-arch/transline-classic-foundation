@@ -39,11 +39,12 @@ export const navItems: NavItem[] = [
     icon: CalendarClock,
     children: [
       { title: "All Trips", url: "/trips" },
-      { title: "Create Trip", url: "/trips/new" },
+      { title: "Create Trip", url: "/trips/new", adminOnly: true },
     ],
   },
   {
     title: "Fleet",
+    adminOnly: true,
     url: "/fleet",
     icon: Bus,
     children: [
@@ -53,6 +54,7 @@ export const navItems: NavItem[] = [
   },
   {
     title: "Routes",
+    adminOnly: true,
     url: "/routes",
     icon: Map,
     children: [
@@ -73,6 +75,7 @@ export const navItems: NavItem[] = [
   },
   {
     title: "Finance",
+    adminOnly: true,
     url: "/finance",
     icon: Wallet,
     children: [
@@ -87,6 +90,7 @@ export const navItems: NavItem[] = [
   },
   {
     title: "Reports",
+    adminOnly: true,
     url: "/reports",
     icon: BarChart3,
     children: [
@@ -97,14 +101,15 @@ export const navItems: NavItem[] = [
       { title: "Branch Reports", url: "/reports/branches" },
     ],
   },
-  { title: "Reconciliation", url: "/reconciliation", icon: Scale },
+  { title: "Reconciliation", url: "/reconciliation", icon: Scale, adminOnly: true },
   {
     title: "Staff",
+    adminOnly: true,
     url: "/staff",
     icon: Users,
     children: [
-      { title: "Staff List", url: "/staff" },
-      { title: "Add Staff", url: "/staff/new" },
+      { title: "Clerks", url: "/staff" },
+      { title: "Add Clerk", url: "/staff/new" },
       { title: "Roles & Permissions", url: "/staff/roles" },
     ],
   },
@@ -114,7 +119,7 @@ export const navItems: NavItem[] = [
     icon: Settings,
     children: [
       { title: "Profile", url: "/settings/profile" },
-      { title: "System Settings", url: "/settings/system" },
+      { title: "System Settings", url: "/settings/system", adminOnly: true },
     ],
   },
 ];
@@ -132,3 +137,14 @@ export const APP_ROLES = [
 
 export const roleLabel = (role?: string | null) =>
   APP_ROLES.find((r) => r.value === role)?.label ?? "Branch Staff";
+
+export function visibleNavItems(role: "admin" | "clerk"): NavItem[] {
+  if (role === "admin") return navItems;
+  return navItems
+    .filter((item) => !item.adminOnly)
+    .map((item) =>
+      item.children
+        ? { ...item, children: item.children.filter((c) => !c.adminOnly) }
+        : item,
+    );
+}
