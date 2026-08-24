@@ -423,24 +423,30 @@ export type Database = {
         Row: {
           branch_id: string | null
           created_at: string | null
+          email: string | null
           full_name: string | null
           id: string
+          is_active: boolean
           phone: string | null
           role: Database["public"]["Enums"]["user_role"]
         }
         Insert: {
           branch_id?: string | null
           created_at?: string | null
+          email?: string | null
           full_name?: string | null
           id: string
+          is_active?: boolean
           phone?: string | null
           role?: Database["public"]["Enums"]["user_role"]
         }
         Update: {
           branch_id?: string | null
           created_at?: string | null
+          email?: string | null
           full_name?: string | null
           id?: string
+          is_active?: boolean
           phone?: string | null
           role?: Database["public"]["Enums"]["user_role"]
         }
@@ -492,6 +498,9 @@ export type Database = {
           bus_plate: string | null
           created_at: string | null
           departure_time: string
+          dispatch_status: string
+          driver_name: string | null
+          driver_phone: string | null
           id: string
           route_id: string | null
           seats_booked: number
@@ -503,6 +512,9 @@ export type Database = {
           bus_plate?: string | null
           created_at?: string | null
           departure_time: string
+          dispatch_status?: string
+          driver_name?: string | null
+          driver_phone?: string | null
           id?: string
           route_id?: string | null
           seats_booked?: number
@@ -514,6 +526,9 @@ export type Database = {
           bus_plate?: string | null
           created_at?: string | null
           departure_time?: string
+          dispatch_status?: string
+          driver_name?: string | null
+          driver_phone?: string | null
           id?: string
           route_id?: string | null
           seats_booked?: number
@@ -582,6 +597,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_main_admin: { Args: never; Returns: boolean }
       is_staff_admin: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
