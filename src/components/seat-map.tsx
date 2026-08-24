@@ -1,4 +1,4 @@
-import { CircleUserRound, DoorOpen, Steering } from "lucide-react";
+import { CircleDot, CircleUserRound, DoorOpen } from "lucide-react";
 
 export type SeatState = "available" | "booked" | "selected" | "blocked";
 
@@ -112,7 +112,7 @@ export function SeatMap({
         {/* Driver cabin */}
         <div className="mb-4 flex items-center justify-between gap-6 rounded-t-[2rem] border-b-2 border-dashed border-border bg-card px-4 py-3">
           <span className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
-            <Steering className="size-5" /> Driver
+            <CircleDot className="size-5" /> Driver
           </span>
           <span className="text-[11px] font-mono uppercase tracking-wide text-muted-foreground">
             {plate ?? "Coach"}
