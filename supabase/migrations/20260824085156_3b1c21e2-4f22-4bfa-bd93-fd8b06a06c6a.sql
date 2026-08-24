@@ -1,0 +1,13 @@
+REVOKE EXECUTE ON FUNCTION public.has_role(uuid, app_role) FROM PUBLIC, anon;
+REVOKE EXECUTE ON FUNCTION public.is_staff_admin(uuid) FROM PUBLIC, anon;
+REVOKE EXECUTE ON FUNCTION public.auth_role() FROM PUBLIC, anon;
+REVOKE EXECUTE ON FUNCTION public.auth_branch() FROM PUBLIC, anon;
+REVOKE EXECUTE ON FUNCTION public.is_main_admin() FROM PUBLIC, anon;
+REVOKE EXECUTE ON FUNCTION public.get_taken_seats(uuid) FROM PUBLIC, anon;
+REVOKE EXECUTE ON FUNCTION public.handle_new_user() FROM PUBLIC, anon, authenticated;
+REVOKE EXECUTE ON FUNCTION public.sync_trip_seats_booked() FROM PUBLIC, anon, authenticated;
+REVOKE EXECUTE ON FUNCTION public.expire_pending_bookings() FROM PUBLIC, anon, authenticated;
+GRANT EXECUTE ON FUNCTION public.auth_role() TO authenticated;
+GRANT EXECUTE ON FUNCTION public.auth_branch() TO authenticated;
+GRANT EXECUTE ON FUNCTION public.is_main_admin() TO authenticated;
+GRANT EXECUTE ON FUNCTION public.get_taken_seats(uuid) TO authenticated;
