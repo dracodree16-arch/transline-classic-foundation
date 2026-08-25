@@ -19,7 +19,15 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { supabase } from "@/integrations/supabase/client";
 import { alerts } from "@/lib/demo-data";
 
-export function AppTopbar({ email, role }: { email: string; role: string }) {
+export function AppTopbar({
+  email,
+  role,
+  branch,
+}: {
+  email: string;
+  role: string;
+  branch?: string | null;
+}) {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
@@ -78,9 +86,16 @@ export function AppTopbar({ email, role }: { email: string; role: string }) {
               </Avatar>
               <span className="hidden text-left leading-tight sm:block">
                 <span className="block max-w-[160px] truncate text-sm font-medium">{email}</span>
-                <Badge variant="secondary" className="mt-0.5 h-4 px-1.5 text-[10px] font-medium">
-                  {role}
-                </Badge>
+                <span className="mt-0.5 flex items-center gap-1">
+                  <Badge variant="secondary" className="h-4 px-1.5 text-[10px] font-medium">
+                    {role}
+                  </Badge>
+                  {branch && (
+                    <Badge variant="outline" className="h-4 px-1.5 text-[10px] font-medium">
+                      {branch}
+                    </Badge>
+                  )}
+                </span>
               </span>
             </button>
           </DropdownMenuTrigger>
