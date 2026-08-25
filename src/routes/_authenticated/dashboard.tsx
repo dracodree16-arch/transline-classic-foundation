@@ -509,5 +509,38 @@ function Dashboard() {
                 <div className="min-w-0">
                   <p className="truncate font-mono text-xs">{p.tracking_code}</p>
                   <p className="truncate text-sm">→ {p.destination_name ?? "—"}</p>
-                  <p className="text-xs text-muted-for              
+                  <p className="text-xs text-muted-foreground">{p.sender_name}</p>
+                </div>
+                <div className="text-right">
+                  <Badge variant={statusVariant(p.status)} className="capitalize">{p.status}</Badge>
+                  <p className="mt-1 text-xs text-muted-foreground">{KES(p.fare_amount)}</p>
+                </div>
+              </li>
+            ))}
+            {recentParcels.length === 0 && !loading && (
+              <p className="text-sm text-muted-foreground">No parcels yet.</p>
+            )}
+          </ul>
+        </SectionCard>
+      </div>
+
+      {isAdmin && (
+        <SectionCard
+          title="Team on duty"
+          action={
+            <Button asChild variant="ghost" size="sm">
+              <Link to="/admin/staff">
+                <Users className="mr-1 size-4" /> Staff
+              </Link>
+            </Button>
+          }
+        >
+          <p className="text-sm text-muted-foreground">
+            {staffCount} staff account{staffCount === 1 ? "" : "s"} configured across all branches.
+          </p>
+        </SectionCard>
+      )}
+    </Page>
+  );
+}              
                 
