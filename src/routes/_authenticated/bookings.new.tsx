@@ -13,6 +13,7 @@ import {
 import { toast } from "sonner";
 import { Page, SectionCard } from "@/components/page-shell";
 import { supabase } from "@/integrations/supabase/client";
+import { SeatMap } from "@/components/app/SeatMap";
 
 export const Route = createFileRoute("/_authenticated/bookings/new")({
   head: () => ({
@@ -225,35 +226,24 @@ function BookingsNewPage() {
       </SectionCard>
 
       {selectedTrip && (
+       {selectedTrip && (
         <SectionCard title="Select seat">
           {loadingSeats ? (
             <p className="text-sm text-muted-foreground">Loading seat availability…</p>
           ) : (
-            <div className="grid grid-cols-6 gap-2 sm:grid-cols-10">
-              {seatNumbers.map((seat) => {
-                const taken = takenSeats.has(seat);
-                const active = selectedSeat === seat;
-                return (
-                  <button
-                    key={seat}
-                    type="button"
-                    disabled={taken}
-                    onClick={() => setSelectedSeat(seat)}
-                    className={[
-                      "rounded-md border px-2 py-2 text-sm font-medium transition-colors",
-                      taken
-                        ? "cursor-not-allowed border-muted bg-muted text-muted-foreground"
-                        : active
-                        ? "border-primary bg-primary text-primary-foreground"
-                        : "border-input bg-background hover:bg-accent",
-                    ].join(" ")}
-                  >
-                    {seat}
-                  </button>
-                );
-              })}
-            </div>
+            <SeatMap
+              capacity={selectedTrip.total_seats}
+              taken={takenSeats}
+              selected={selectedSeat || undefined}
+              onSelect={setSelectedSeat}
+              plate={selectedTrip.bus_plate}
+            />
           )}
+          <p className="mt-2 text-xs text-muted-foreground">
+            {takenSeats.size} of {selectedTrip.total_seats} seats booked
+          </p>
+        </SectionCard>
+      )}
           <p className="mt-2 text-xs text-muted-foreground">
             {takenSeats.size} of {selectedTrip.total_seats} seats booked
           </p>
