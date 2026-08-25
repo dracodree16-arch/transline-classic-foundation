@@ -1,38 +1,155 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { useState } from "react";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { toast } from "sonner";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { toast } from "sonner";
-import { Page, SectionCard, DemoNotice } from "@/components/page-shell";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Page, SectionCard } from "@/components/page-shell";
+import { supabase } from "@/integrations/supabase/client";
+import { createClerk } from "@/lib/staff.functions";
+import { useStaffSession } from "@/lib/session";
 
 export const Route = createFileRoute("/_authenticated/staff/new")({
   head: () => ({
     meta: [
-      { title: "Add Staff | Transline Classic TMS" },
-      { name: "description", content: "Invite a staff member and assign a role." },
-      { property: "og:title", content: "Add Staff | Transline Classic TMS" },
-      { property: "og:description", content: "Invite a staff member and assign a role." },
+      { title: "Add Clerk | Transline Classic TMS" },
+      { name: "description", content: "Create a clerk account and assign a branch." },
+      { property: "og:title", content: "Add Clerk | Transline Classic TMS" },
+      { property: "og:description", content: "Create a clerk account and assign a branch." },
     ],
   }),
   component: StaffNewPage,
 });
 
 function StaffNewPage() {
+  const { isAdmin } = useStaffSession();
+  const navigate = useNavigate();
+  const addClerk = useServerFn(createClerk);
+
+  const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [password, setPassword] = useState("");
+  const [branchId, setBranchId] = useState("");
+  const [role, setRole] = useState<"admin" | "clerk">("clerk");
+
+  const { data: branches } = useQuery({
+    queryKey: ["branches"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("branches").select("id, name, town").order("name");
+      if (error) throw new Error(error.message);
+      return data ?? [];
+    },
+  });
+
+  const create = useMutation({
+    mutationFn: () =>
+      addClerk({
+        data: {
+          full_name: fullName.trim(),
+          email: email.trim(),
+          password,
+          phone: phone.trim() || undefined,
+          branch_id: branchId,
+          role,
+        },
+      }),
+    onSuccess: () => {
+      toast.success("Staff account created");
+      navigate({ to: "/staff" });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  if (!isAdmin) {
+    return (
+      <Page title="Add Clerk" description="Main admin only.">
+        <SectionCard title="Restricted">
+          <p className="text-sm text-muted-foreground">Only the main admin can create staff accounts.</p>
+        </SectionCard>
+      </Page>
+    );
+  }
+
   return (
-    <Page title="Add Staff" description="Invite a staff member and assign a role.">
-      <DemoNotice />
+    <Page title="Add Clerk" description="Create a clerk account and assign a branch.">
       <SectionCard title="Staff details">
-        <form className="grid gap-4 sm:grid-cols-2" onSubmit={(e) => { e.preventDefault(); toast.info("Demo only — saving is enabled in a later phase."); }}>
-            <div className="space-y-2"><Label>Full name</Label><Input placeholder="Full name" /></div>
-            <div className="space-y-2"><Label>Work email</Label><Input placeholder="Work email" /></div>
-            <div className="space-y-2"><Label>Phone number</Label><Input placeholder="Phone number" /></div>
-            <div className="space-y-2"><Label>Branch</Label><Input placeholder="Branch" /></div>
-            <div className="space-y-2"><Label>Role</Label><Input placeholder="Role" /></div>
-            <div className="space-y-2"><Label>Employee number</Label><Input placeholder="Employee number" /></div>
-            <div className="sm:col-span-2">
-              <Button type="submit">Invite staff</Button>
-            </div>
-          </form>
+        <form
+          className="grid gap-4 sm:grid-cols-2"
+          onSubmit={(e) => {
+            e.preventDefault();
+            if (!fullName.trim() || !email.trim() || password.length < 8 || !branchId) {
+              toast.error("Fill in name, email, branch and a password of 8+ characters.");
+              return;
+            }
+            create.mutate();
+          }}
+        >
+          <div className="space-y-2">
+            <Label>Full name</Label>
+            <Input value={fullName} onChange={(e) => setFullName(e.target.value)} placeholder="Full name" />
+          </div>
+          <div className="space-y-2">
+            <Label>Work email</Label>
+            <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Work email" />
+          </div>
+          <div className="space-y-2">
+            <Label>Phone number</Label>
+            <Input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+254…" />
+          </div>
+          <div className="space-y-2">
+            <Label>Temporary password</Label>
+            <Input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="At least 8 characters"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label>Branch</Label>
+            <Select value={branchId} onValueChange={setBranchId}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select branch" />
+              </SelectTrigger>
+              <SelectContent>
+                {(branches ?? []).map((b) => (
+                  <SelectItem key={b.id} value={b.id}>
+                    {b.name}
+                    {b.town ? ` — ${b.town}` : ""}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-2">
+            <Label>Role</Label>
+            <Select value={role} onValueChange={(v) => setRole(v as "admin" | "clerk")}>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="clerk">Clerk</SelectItem>
+                <SelectItem value="admin">Main Admin</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="sm:col-span-2">
+            <Button type="submit" disabled={create.isPending}>
+              {create.isPending ? "Creating…" : "Create staff account"}
+            </Button>
+          </div>
+        </form>
       </SectionCard>
     </Page>
   );
