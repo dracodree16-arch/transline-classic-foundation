@@ -1,7 +1,7 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { ChevronDown } from "lucide-react";
 
-import { navItems } from "@/lib/nav";
+import { visibleNavItems } from "@/lib/nav";
 import {
   Sidebar,
   SidebarContent,
@@ -24,8 +24,9 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 
-export function AppSidebar() {
+export function AppSidebar({ role }: { role: "admin" | "clerk" }) {
   const { state } = useSidebar();
+  const navItems = visibleNavItems(role);
   const collapsed = state === "collapsed";
   const pathname = useRouterState({ select: (r) => r.location.pathname });
 
@@ -96,7 +97,7 @@ export function AppSidebar() {
       <SidebarFooter className="border-t border-sidebar-border">
         {!collapsed && (
           <p className="px-2 py-1 text-[11px] leading-snug text-sidebar-foreground/60">
-            Demo environment — sample Kenyan operations data.
+            {role === "admin" ? "Main Admin — full system access." : "Clerk — branch access only."}
           </p>
         )}
       </SidebarFooter>
