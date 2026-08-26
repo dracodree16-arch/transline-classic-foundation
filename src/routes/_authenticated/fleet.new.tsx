@@ -1,11 +1,25 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
+import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
+import { toast } from "sonner";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { toast } from "sonner";
-import { Page, SectionCard, DemoNotice } from "@/components/page-shell";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Page, SectionCard } from "@/components/page-shell";
+import { supabase } from "@/integrations/supabase/client";
+import { useStaffSession } from "@/lib/session";
 
 export const Route = createFileRoute("/_authenticated/fleet/new")({
+  beforeLoad: ({ context }) => {
+    if (context.profile.role !== "admin") throw redirect({ to: "/fleet" });
+  },
   head: () => ({
     meta: [
       { title: "Add Bus | Transline Classic TMS" },
@@ -17,22 +31,138 @@ export const Route = createFileRoute("/_authenticated/fleet/new")({
   component: FleetNewPage,
 });
 
+type BranchOption = { id: string; name: string };
+
+const STATUSES = ["Active", "Maintenance", "Retired"];
+
 function FleetNewPage() {
+  const navigate = useNavigate();
+  const { branchId } = useStaffSession();
+
+  const [branches, setBranches] = useState<BranchOption[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const [plate, setPlate] = useState("");
+  const [model, setModel] = useState("");
+  const [capacity, setCapacity] = useState("");
+  const [branchIdField, setBranchIdField] = useState("");
+  const [status, setStatus] = useState("Active");
+  const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    let active = true;
+    (async () => {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from("branches")
+        .select("id, name")
+        .order("name", { ascending: true });
+      if (!active) return;
+      if (error) toast.error("Failed to load branches: " + error.message);
+      setBranches((data ?? []) as BranchOption[]);
+      if (branchId) setBranchIdField(branchId);
+      setLoading(false);
+    })();
+    return () => {
+      active = false;
+    };
+  }, [branchId]);
+
+  async function handleSubmit(e: { preventDefault: () => void }) {
+    e.preventDefault();
+    if (!plate.trim()) return toast.error("Enter a plate number.");
+    const seats = Number(capacity);
+    if (!seats || seats < 1) return toast.error("Enter a valid seat capacity.");
+
+    setSubmitting(true);
+    const { error } = await supabase.from("buses").insert({
+      plate_number: plate.trim().toUpperCase(),
+      model: model.trim() || null,
+      capacity: seats,
+      branch_id: branchIdField || null,
+      status,
+    });
+    setSubmitting(false);
+
+    if (error) {
+      toast.error("Failed to add bus: " + error.message);
+      return;
+    }
+    toast.success("Bus added to fleet");
+    navigate({ to: "/fleet" });
+  }
+
   return (
     <Page title="Add Bus" description="Register a new bus into the fleet.">
-      <DemoNotice />
       <SectionCard title="Bus details">
-        <form className="grid gap-4 sm:grid-cols-2" onSubmit={(e) => { e.preventDefault(); toast.info("Demo only — saving is enabled in a later phase."); }}>
-            <div className="space-y-2"><Label>Plate number</Label><Input placeholder="Plate number" /></div>
-            <div className="space-y-2"><Label>Model</Label><Input placeholder="Model" /></div>
-            <div className="space-y-2"><Label>Seat capacity</Label><Input placeholder="Seat capacity" /></div>
-            <div className="space-y-2"><Label>Home branch</Label><Input placeholder="Home branch" /></div>
-            <div className="space-y-2"><Label>Status</Label><Input placeholder="Status" /></div>
-            <div className="space-y-2"><Label>Year of manufacture</Label><Input placeholder="Year of manufacture" /></div>
-            <div className="sm:col-span-2">
-              <Button type="submit">Add bus</Button>
-            </div>
-          </form>
+        <form className="grid gap-4 sm:grid-cols-2" onSubmit={handleSubmit}>
+          <div className="space-y-2">
+            <Label>Plate number</Label>
+            <Input
+              value={plate}
+              onChange={(e) => setPlate(e.target.value)}
+              placeholder="e.g. KDA 123X"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label>Model</Label>
+            <Input
+              value={model}
+              onChange={(e) => setModel(e.target.value)}
+              placeholder="e.g. Scania Marcopolo"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label>Seat capacity</Label>
+            <Input
+              type="number"
+              min={1}
+              value={capacity}
+              onChange={(e) => setCapacity(e.target.value)}
+              placeholder="e.g. 49"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label>Home branch</Label>
+            <Select value={branchIdField} onValueChange={setBranchIdField} disabled={loading}>
+              <SelectTrigger>
+                <SelectValue placeholder={loading ? "Loading…" : "Select a branch"} />
+              </SelectTrigger>
+              <SelectContent>
+                {branches.map((b) => (
+                  <SelectItem key={b.id} value={b.id}>
+                    {b.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label>Status</Label>
+            <Select value={status} onValueChange={setStatus}>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {STATUSES.map((s) => (
+                  <SelectItem key={s} value={s}>
+                    {s}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="sm:col-span-2">
+            <Button type="submit" disabled={submitting}>
+              {submitting ? "Adding…" : "Add bus"}
+            </Button>
+          </div>
+        </form>
       </SectionCard>
     </Page>
   );
