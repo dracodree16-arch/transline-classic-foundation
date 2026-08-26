@@ -1,9 +1,18 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { toast } from "sonner";
-import { Page, SectionCard, DemoNotice } from "@/components/page-shell";
+import { Page, SectionCard } from "@/components/page-shell";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/_authenticated/routes/new")({
   head: () => ({
@@ -17,21 +26,90 @@ export const Route = createFileRoute("/_authenticated/routes/new")({
   component: RoutesNewPage,
 });
 
+type BranchOption = { id: string; name: string };
+
 function RoutesNewPage() {
+  const navigate = useNavigate();
+
+  const [branches, setBranches] = useState<BranchOption[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const [originBranchId, setOriginBranchId] = useState("");
+  const [destination, setDestination] = useState("");
+  const [baseFare, setBaseFare] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    let active = true;
+    (async () => {
+      setLoading(true);
+      const { data, error } = await supabase.from("branches").select("id, name").order("name");
+      if (!active) return;
+      if (error) toast.error("Failed to load branches: " + error.message);
+      else setBranches(data ?? []);
+      setLoading(false);
+    })();
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  async function handleSubmit(e: { preventDefault: () => void }) {
+    e.preventDefault();
+
+    if (!originBranchId) return toast.error("Select an origin branch.");
+    if (!destination.trim()) return toast.error("Destination is required.");
+    if (!baseFare || Number(baseFare) <= 0) return toast.error("Enter a valid base fare.");
+
+    setSubmitting(true);
+    const { error } = await supabase.from("routes").insert({
+      origin_branch_id: originBranchId,
+      destination: destination.trim(),
+      base_fare: Number(baseFare),
+    });
+    setSubmitting(false);
+
+    if (error) {
+      toast.error("Failed to add route: " + error.message);
+      return;
+    }
+    toast.success("Route added.");
+    navigate({ to: "/routes" });
+  }
+
   return (
     <Page title="Add Route" description="Define origin, destination and base fare.">
-      <DemoNotice />
       <SectionCard title="Route details">
-        <form className="grid gap-4 sm:grid-cols-2" onSubmit={(e) => { e.preventDefault(); toast.info("Demo only — saving is enabled in a later phase."); }}>
-            <div className="space-y-2"><Label>Origin branch</Label><Input placeholder="Origin branch" /></div>
-            <div className="space-y-2"><Label>Destination</Label><Input placeholder="Destination" /></div>
-            <div className="space-y-2"><Label>Base fare (KES)</Label><Input placeholder="Base fare (KES)" /></div>
-            <div className="space-y-2"><Label>Distance (km)</Label><Input placeholder="Distance (km)" /></div>
-            <div className="space-y-2"><Label>Estimated duration</Label><Input placeholder="Estimated duration" /></div>
-            <div className="sm:col-span-2">
-              <Button type="submit">Add route</Button>
-            </div>
-          </form>
+        <form className="grid gap-4 sm:grid-cols-2" onSubmit={handleSubmit}>
+          <div className="space-y-2">
+            <Label>Origin branch</Label>
+            <Select value={originBranchId} onValueChange={setOriginBranchId} disabled={loading}>
+              <SelectTrigger>
+                <SelectValue placeholder={loading ? "Loading…" : "Select a branch"} />
+              </SelectTrigger>
+              <SelectContent>
+                {branches.map((b) => (
+                  <SelectItem key={b.id} value={b.id}>
+                    {b.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-2">
+            <Label>Destination</Label>
+            <Input value={destination} onChange={(e) => setDestination(e.target.value)} placeholder="Destination" />
+          </div>
+          <div className="space-y-2">
+            <Label>Base fare (KES)</Label>
+            <Input value={baseFare} onChange={(e) => setBaseFare(e.target.value)} placeholder="Base fare (KES)" type="number" />
+          </div>
+          <div className="sm:col-span-2">
+            <Button type="submit" disabled={submitting}>
+              {submitting ? "Adding…" : "Add route"}
+            </Button>
+          </div>
+        </form>
       </SectionCard>
     </Page>
   );
