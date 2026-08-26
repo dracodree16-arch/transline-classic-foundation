@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Printer } from "lucide-react";
 import { Page, SectionCard } from "@/components/page-shell";
 import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/lib/useAuth";
+import { useStaffSession } from "@/lib/session";
 
 export const Route = createFileRoute("/_authenticated/bookings/manifest")({
   head: () => ({
@@ -43,8 +43,7 @@ type ManifestRow = {
 };
 
 function BookingsManifestPage() {
-  const { profile } = useAuth();
-  const isAdmin = profile?.role === "admin";
+  const { profile, isAdmin } = useStaffSession();
 
   const [trips, setTrips] = useState<TripOption[]>([]);
   const [tripId, setTripId] = useState<string>("");
@@ -189,5 +188,4 @@ function BookingsManifestPage() {
       </SectionCard>
     </Page>
   );
-      }
-            
+}

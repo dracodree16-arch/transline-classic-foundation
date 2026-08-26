@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { supabase } from "@/integrations/supabase/client";
-import { alerts } from "@/lib/demo-data";
+import { useEffect, useState } from "react";
 
 export function AppTopbar({
   email,
@@ -30,6 +30,23 @@ export function AppTopbar({
 }) {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const [alerts, setAlerts] = useState<Array<{ id: string; title: string; message: string | null }>>([]);
+
+  useEffect(() => {
+    let active = true;
+    void supabase
+      .from("notifications")
+      .select("id, title, message")
+      .eq("is_read", false)
+      .order("created_at", { ascending: false })
+      .limit(8)
+      .then(({ data }) => {
+        if (active) setAlerts(data ?? []);
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const initials = email.slice(0, 2).toUpperCase();
 
@@ -61,7 +78,7 @@ export function AppTopbar({
           <PopoverTrigger asChild>
             <Button variant="ghost" size="icon" className="relative" aria-label="Notifications">
               <Bell className="size-4" />
-              <span className="absolute right-1.5 top-1.5 size-2 rounded-full bg-destructive" />
+               {alerts.length > 0 && <span className="absolute right-1.5 top-1.5 size-2 rounded-full bg-destructive" />}
             </Button>
           </PopoverTrigger>
           <PopoverContent align="end" className="w-80 p-0">
@@ -71,9 +88,9 @@ export function AppTopbar({
                 <li key={a.id} className="px-4 py-3">
                   <p className="text-sm font-medium">{a.title}</p>
                   <p className="text-xs text-muted-foreground">{a.message}</p>
-                  <p className="mt-1 text-[11px] text-muted-foreground">{a.time}</p>
                 </li>
               ))}
+              {alerts.length === 0 && <li className="px-4 py-5 text-sm text-muted-foreground">No new notifications.</li>}
             </ul>
           </PopoverContent>
         </Popover>

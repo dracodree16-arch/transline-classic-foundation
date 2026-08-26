@@ -13,7 +13,7 @@ import {
 import { toast } from "sonner";
 import { Page, SectionCard } from "@/components/page-shell";
 import { supabase } from "@/integrations/supabase/client";
-import { SeatMap } from "@/components/app/SeatMap";
+import { SeatMap } from "@/components/seat-map";
 
 export const Route = createFileRoute("/_authenticated/bookings/new")({
   head: () => ({
@@ -193,10 +193,6 @@ function BookingsNewPage() {
     setSubmitting(false);
   }
 
-  const seatNumbers = selectedTrip
-    ? Array.from({ length: selectedTrip.total_seats }, (_, i) => String(i + 1))
-    : [];
-
   return (
     <Page title="New Booking" description="Capture passenger details and issue a ticket.">
       <SectionCard title="Trip">
@@ -226,7 +222,6 @@ function BookingsNewPage() {
       </SectionCard>
 
       {selectedTrip && (
-       {selectedTrip && (
         <SectionCard title="Select seat">
           {loadingSeats ? (
             <p className="text-sm text-muted-foreground">Loading seat availability…</p>
@@ -239,11 +234,6 @@ function BookingsNewPage() {
               plate={selectedTrip.bus_plate}
             />
           )}
-          <p className="mt-2 text-xs text-muted-foreground">
-            {takenSeats.size} of {selectedTrip.total_seats} seats booked
-          </p>
-        </SectionCard>
-      )}
           <p className="mt-2 text-xs text-muted-foreground">
             {takenSeats.size} of {selectedTrip.total_seats} seats booked
           </p>

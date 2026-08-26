@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
@@ -20,6 +20,9 @@ import { createClerk } from "@/lib/staff.functions";
 import { useStaffSession } from "@/lib/session";
 
 export const Route = createFileRoute("/_authenticated/staff/new")({
+  beforeLoad: ({ context }) => {
+    if (context.profile.role !== "admin") throw redirect({ to: "/dashboard" });
+  },
   head: () => ({
     meta: [
       { title: "Add Clerk | Transline Classic TMS" },
