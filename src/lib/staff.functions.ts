@@ -3,23 +3,11 @@ import { z } from "zod";
 
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
-async function assertAdmin(supabase: {
-  from: (t: string) => any;
-}, userId: string) {
-  const { data } = await supabase
-    .from("profiles")
-    .select("role, is_active")
-    .eq("id", userId)
-    .maybeSingle();
-  if (!data || data.role !== "admin" || data.is_active === false) {
-    throw new Error("Forbidden — main admin only");
-  }
-}
-
 export const listStaff = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    await assertAdmin(context.supabase, context.userId);
+    const { data: allowed } = await context.supabase.rpc("is_main_admin");
+    if (!allowed) throw new Error("Forbidden — main admin only");
     const { data, error } = await context.supabase
       .from("profiles")
       .select("id, full_name, email, phone, role, is_active, branch_id, created_at, branches(name)")
@@ -52,7 +40,8 @@ export const createClerk = createServerFn({ method: "POST" })
       .parse(input),
   )
   .handler(async ({ data, context }) => {
-    await assertAdmin(context.supabase, context.userId);
+    const { data: allowed } = await context.supabase.rpc("is_main_admin");
+    if (!allowed) throw new Error("Forbidden — main admin only");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
     const { data: created, error } = await supabaseAdmin.auth.admin.createUser({
@@ -94,7 +83,8 @@ export const updateStaff = createServerFn({ method: "POST" })
       .parse(input),
   )
   .handler(async ({ data, context }) => {
-    await assertAdmin(context.supabase, context.userId);
+    const { data: allowed } = await context.supabase.rpc("is_main_admin");
+    if (!allowed) throw new Error("Forbidden — main admin only");
     if (data.id === context.userId && data.is_active === false) {
       throw new Error("You cannot deactivate your own account");
     }
@@ -110,7 +100,8 @@ export const resetStaffPassword = createServerFn({ method: "POST" })
     z.object({ id: z.string().uuid(), password: z.string().min(8) }).parse(input),
   )
   .handler(async ({ data, context }) => {
-    await assertAdmin(context.supabase, context.userId);
+    const { data: allowed } = await context.supabase.rpc("is_main_admin");
+    if (!allowed) throw new Error("Forbidden — main admin only");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { error } = await supabaseAdmin.auth.admin.updateUserById(data.id, {
       password: data.password,

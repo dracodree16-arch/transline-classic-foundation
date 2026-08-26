@@ -44,7 +44,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/lib/useAuth";
+import { useStaffSession } from "@/lib/session";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({
@@ -136,8 +136,7 @@ type RecentParcel = {
 };
 
 function Dashboard() {
-  const { profile } = useAuth();
-  const isAdmin = profile?.role === "admin";
+  const { profile, isAdmin } = useStaffSession();
 
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({

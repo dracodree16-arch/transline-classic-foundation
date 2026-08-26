@@ -6,7 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { toast } from "sonner";
 import { Page, SectionCard } from "@/components/page-shell";
 import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/lib/useAuth";
+import { useStaffSession } from "@/lib/session";
 
 export const Route = createFileRoute("/_authenticated/bookings/dispatch")({
   head: () => ({
@@ -40,8 +40,7 @@ type DispatchRow = {
 };
 
 function BookingsDispatchPage() {
-  const { profile } = useAuth();
-  const isAdmin = profile?.role === "admin";
+  const { profile, isAdmin } = useStaffSession();
 
   const [rows, setRows] = useState<DispatchRow[]>([]);
   const [loading, setLoading] = useState(true);
@@ -162,5 +161,4 @@ function BookingsDispatchPage() {
       </SectionCard>
     </Page>
   );
-          }
-                
+}

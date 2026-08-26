@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
@@ -23,6 +23,9 @@ import { listStaff, resetStaffPassword, updateStaff } from "@/lib/staff.function
 import { useStaffSession } from "@/lib/session";
 
 export const Route = createFileRoute("/_authenticated/staff/")({
+  beforeLoad: ({ context }) => {
+    if (context.profile.role !== "admin") throw redirect({ to: "/dashboard" });
+  },
   head: () => ({
     meta: [
       { title: "Staff & Clerks | Transline Classic TMS" },
