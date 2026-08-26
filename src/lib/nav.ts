@@ -10,6 +10,8 @@ import {
   Users,
   Settings,
   CalendarClock,
+  ShieldCheck,
+  LineChart,
 } from "lucide-react";
 
 export type NavItem = {
@@ -22,6 +24,7 @@ export type NavItem = {
 
 export const navItems: NavItem[] = [
   { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
+  { title: "Admin", url: "/admin", icon: ShieldCheck, adminOnly: true },
   {
     title: "Bookings",
     url: "/bookings",
@@ -101,6 +104,7 @@ export const navItems: NavItem[] = [
       { title: "Branch Reports", url: "/reports/branches" },
     ],
   },
+  { title: "Analysis", url: "/analysis", icon: LineChart, adminOnly: true },
   { title: "Reconciliation", url: "/reconciliation", icon: Scale, adminOnly: true },
   {
     title: "Staff",
