@@ -39,7 +39,7 @@ export const navItems: NavItem[] = [
     icon: CalendarClock,
     children: [
       { title: "All Trips", url: "/trips" },
-      { title: "Create Trip", url: "/trips/new", adminOnly: true },
+      { title: "Create Trip", url: "/trips/new" },
     ],
   },
   {

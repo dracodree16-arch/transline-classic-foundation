@@ -76,6 +76,14 @@ const actionGroups = [
     ],
   },
   {
+    title: "Trip Management",
+    icon: CalendarClock,
+    actions: [
+      { label: "Add Trip", to: "/trips/new", icon: CalendarClock },
+      { label: "All Trips", to: "/trips", icon: CalendarClock },
+    ],
+  },
+  {
     title: "Parcel Management",
     icon: Package,
     actions: [
