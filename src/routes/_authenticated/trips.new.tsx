@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -32,6 +33,7 @@ type BranchOption = { id: string; name: string };
 
 function TripsNewPage() {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   const [routes, setRoutes] = useState<RouteOption[]>([]);
   const [buses, setBuses] = useState<BusOption[]>([]);
@@ -130,6 +132,7 @@ function TripsNewPage() {
       return;
     }
     toast.success("Trip scheduled.");
+    await queryClient.invalidateQueries({ queryKey: ["trips", "all"] });
     navigate({ to: "/trips" });
   }
 

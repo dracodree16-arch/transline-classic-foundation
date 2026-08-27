@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 
@@ -37,6 +37,7 @@ export const Route = createFileRoute("/_authenticated/staff/new")({
 function StaffNewPage() {
   const { isAdmin } = useStaffSession();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const addClerk = useServerFn(createClerk);
 
   const [fullName, setFullName] = useState("");
@@ -67,8 +68,9 @@ function StaffNewPage() {
           role,
         },
       }),
-    onSuccess: () => {
+    onSuccess: async () => {
       toast.success("Staff account created");
+      await queryClient.invalidateQueries({ queryKey: ["staff"] });
       navigate({ to: "/staff" });
     },
     onError: (e: Error) => toast.error(e.message),
