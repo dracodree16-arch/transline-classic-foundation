@@ -134,6 +134,10 @@ function BookingsNewPage() {
 
     const { data: userData } = await supabase.auth.getUser();
     const userId = userData.user?.id;
+    if (!userId) {
+      setSubmitting(false);
+      return toast.error("You must be signed in to create a booking.");
+    }
 
     const { data: profile } = await supabase
       .from("profiles")
@@ -156,7 +160,7 @@ function BookingsNewPage() {
         passenger_name: passengerName.trim(),
         passenger_phone: passengerPhone.trim(),
         fare_amount: Number(fare),
-        payment_status: paymentMethod === "cash" ? "paid" : "pending",
+        payment_status: (paymentMethod === "cash" ? "paid" : "pending") as "paid" | "pending",
         payment_method: paymentMethod,
         branch_id: profile.branch_id,
         booked_by: userId,
@@ -201,8 +205,9 @@ function BookingsNewPage() {
     setPassengerPhone("");
     setIdNumber("");
     setSelectedSeat("");
-    if (selectedTripId) loadTakenSeats(selectedTripId);
+    if (selectedTripId) await loadTakenSeats(selectedTripId);
     setSubmitting(false);
+    return;
   }
 
   return (
@@ -223,7 +228,7 @@ function BookingsNewPage() {
                 {trips.map((t) => (
                   <SelectItem key={t.id} value={t.id}>
                     {(t.origin_town ?? "—") + " → " + (t.destination ?? "—")} ·{" "}
-                    {new Date(t.departure_time).toLocaleString()} · {t.bus_plate ?? "no bus"} (
+                    {new Date(t.departure_time).toLocaleString("en-KE", { timeZone: "Africa/Nairobi" })} · {t.bus_plate ?? "no bus"} (
                     {t.total_seats - t.seats_booked} seats left)
                   </SelectItem>
                 ))}
