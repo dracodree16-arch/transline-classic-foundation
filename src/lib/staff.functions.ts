@@ -54,15 +54,15 @@ export const createClerk = createServerFn({ method: "POST" })
 
     const { error: upErr } = await supabaseAdmin
       .from("profiles")
-      .update({
+      .upsert({
+        id: created.user.id,
         full_name: data.full_name,
         email: data.email,
         phone: data.phone ?? null,
         branch_id: data.branch_id,
         role: data.role,
         is_active: true,
-      })
-      .eq("id", created.user.id);
+      }, { onConflict: "id" });
     if (upErr) throw new Error(upErr.message);
 
     return { id: created.user.id };

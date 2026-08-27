@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -31,6 +32,7 @@ const STATUSES = ["active", "maintenance", "inactive"];
 
 function FleetNewPage() {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   const [branches, setBranches] = useState<BranchOption[]>([]);
   const [loading, setLoading] = useState(true);
@@ -82,6 +84,7 @@ function FleetNewPage() {
       return;
     }
     toast.success("Bus added to the fleet.");
+    await queryClient.invalidateQueries({ queryKey: ["buses"] });
     navigate({ to: "/fleet" });
   }
 

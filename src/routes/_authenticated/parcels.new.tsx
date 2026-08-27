@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -30,6 +31,7 @@ type BranchOption = { id: string; name: string };
 
 function ParcelsNewPage() {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   const [branches, setBranches] = useState<BranchOption[]>([]);
   const [loading, setLoading] = useState(true);
@@ -98,6 +100,7 @@ function ParcelsNewPage() {
       return;
     }
     toast.success(`Parcel booked — tracking ${trackingCode}, access code ${accessPassword}`);
+    await queryClient.invalidateQueries({ queryKey: ["parcels", "all"] });
     navigate({ to: "/parcels" });
   }
 

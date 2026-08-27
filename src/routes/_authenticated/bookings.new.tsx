@@ -14,6 +14,7 @@ import { toast } from "sonner";
 import { Page, SectionCard } from "@/components/page-shell";
 import { supabase } from "@/integrations/supabase/client";
 import { SeatMap } from "@/components/seat-map";
+import { initiateMpesaPayment } from "@/lib/mpesa";
 
 export const Route = createFileRoute("/_authenticated/bookings/new")({
   head: () => ({
@@ -51,6 +52,7 @@ function BookingsNewPage() {
   const [passengerPhone, setPassengerPhone] = useState("");
   const [idNumber, setIdNumber] = useState("");
   const [fare, setFare] = useState("");
+  const [paymentMethod, setPaymentMethod] = useState<"cash" | "mpesa">("cash");
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
@@ -154,7 +156,8 @@ function BookingsNewPage() {
         passenger_name: passengerName.trim(),
         passenger_phone: passengerPhone.trim(),
         fare_amount: Number(fare),
-        payment_status: "pending",
+        payment_status: paymentMethod === "cash" ? "paid" : "pending",
+        payment_method: paymentMethod,
         branch_id: profile.branch_id,
         booked_by: userId,
         booking_ref: bookingRef,
@@ -184,7 +187,16 @@ function BookingsNewPage() {
       });
     }
 
-    toast.success(`Booking ${bookingRef} created — seat ${selectedSeat}`);
+    if (paymentMethod === "mpesa") {
+      try {
+        const result = await initiateMpesaPayment(booking.id, passengerPhone.trim());
+        toast.success(result.message);
+      } catch (paymentError) {
+        toast.error(paymentError instanceof Error ? paymentError.message : "Failed to initiate M-Pesa payment.");
+      }
+    } else {
+      toast.success(`Booking ${bookingRef} created — seat ${selectedSeat}`);
+    }
     setPassengerName("");
     setPassengerPhone("");
     setIdNumber("");
@@ -261,6 +273,16 @@ function BookingsNewPage() {
           <div className="space-y-2">
             <Label>Fare (KES)</Label>
             <Input value={fare} onChange={(e) => setFare(e.target.value)} placeholder="Fare (KES)" type="number" />
+          </div>
+          <div className="space-y-2">
+            <Label>Payment method</Label>
+            <Select value={paymentMethod} onValueChange={(value) => setPaymentMethod(value as "cash" | "mpesa")}>
+              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="cash">Cash</SelectItem>
+                <SelectItem value="mpesa">M-Pesa</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
           <div className="sm:col-span-2">
             <Button type="submit" disabled={submitting || !selectedTripId || !selectedSeat}>
