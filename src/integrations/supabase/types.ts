@@ -57,6 +57,7 @@ export type Database = {
           mpesa_receipt: string | null
           passenger_name: string
           passenger_phone: string
+          payment_method: string | null
           payment_status: string | null
           seat_number: string | null
           trip_id: string
@@ -73,6 +74,7 @@ export type Database = {
           mpesa_receipt?: string | null
           passenger_name: string
           passenger_phone: string
+          payment_method?: string | null
           payment_status?: string | null
           seat_number?: string | null
           trip_id: string
@@ -89,6 +91,7 @@ export type Database = {
           mpesa_receipt?: string | null
           passenger_name?: string
           passenger_phone?: string
+          payment_method?: string | null
           payment_status?: string | null
           seat_number?: string | null
           trip_id?: string
