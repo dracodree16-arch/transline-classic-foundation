@@ -78,14 +78,24 @@ Deno.serve(async (req) => {
     const authRes = await fetch(`${base}/oauth/v1/generate?grant_type=client_credentials`, {
       headers: { Authorization: "Basic " + btoa(`${consumerKey}:${consumerSecret}`) },
     });
-    if (!authRes.ok) return json({ error: "Failed to authenticate with Daraja" }, 502);
-    const { access_token } = await authRes.json();
+    const authBody = await authRes.json().catch(() => ({}));
+    if (!authRes.ok || !authBody.access_token) {
+      console.error("[mpesa-stk-push] Daraja OAuth failed", { status: authRes.status, body: authBody });
+      return json({ error: authBody.error_description ?? "Failed to authenticate with Daraja", darajaStatus: authRes.status }, 502);
+    }
+    const { access_token } = authBody;
 
-    // 2. STK push.
-    const timestamp = new Date()
-      .toISOString()
-      .replace(/[^0-9]/g, "")
-      .slice(0, 14);
+    // Daraja requires the password timestamp in Kenya local time, not UTC.
+    const timestamp = new Intl.DateTimeFormat("en-CA", {
+      timeZone: "Africa/Nairobi",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      hourCycle: "h23",
+    }).format(new Date()).replace(/[^0-9]/g, "");
     const password = btoa(`${shortcode}${passkey}${timestamp}`);
 
     const stkRes = await fetch(`${base}/mpesa/stkpush/v1/processrequest`, {
@@ -109,14 +119,15 @@ Deno.serve(async (req) => {
       }),
     });
 
-    const stk = await stkRes.json();
+    const stk = await stkRes.json().catch(() => ({}));
+    console.log("[mpesa-stk-push] STK response", { status: stkRes.status, responseCode: stk.ResponseCode, errorCode: stk.errorCode });
 
-    if (stk.ResponseCode !== "0") {
-      return json({ error: stk.errorMessage ?? stk.ResponseDescription ?? "STK push failed", detail: stk }, 502);
+    if (!stkRes.ok || stk.ResponseCode !== "0" || !stk.CheckoutRequestID) {
+      return json({ error: stk.errorMessage ?? stk.ResponseDescription ?? "STK push failed", darajaStatus: stkRes.status, errorCode: stk.errorCode }, 502);
     }
 
     // 3. Record a pending payment we can reconcile in the callback.
-    await supabase.from("payments").insert({
+    const { error: paymentError } = await supabase.from("payments").insert({
       reference_type: "booking",
       reference_id: booking.id,
       amount,
@@ -124,6 +135,10 @@ Deno.serve(async (req) => {
       status: "pending",
       mpesa_checkout_request_id: stk.CheckoutRequestID,
     });
+    if (paymentError) {
+      console.error("[mpesa-stk-push] Failed to record pending payment", paymentError);
+      return json({ error: "STK push was sent, but payment tracking failed." }, 500);
+    }
 
     return json({
       success: true,

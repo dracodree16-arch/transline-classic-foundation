@@ -106,6 +106,8 @@ function TripsNewPage() {
   async function handleSubmit(e: { preventDefault: () => void }) {
     e.preventDefault();
 
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return toast.error("Your session has expired. Sign in again.");
     if (!routeId) return toast.error("Select a route.");
     if (!branchId) return toast.error("Select a branch.");
     if (!departureDate || !departureTime) return toast.error("Set the departure date and time.");
