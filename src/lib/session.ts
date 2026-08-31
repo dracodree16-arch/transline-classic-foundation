@@ -1,4 +1,4 @@
-import { getRouteApi } from "@tanstack/react-router";
+import { useMatches } from "@tanstack/react-router";
 
 export type StaffProfile = {
   id: string;
@@ -10,13 +10,17 @@ export type StaffProfile = {
   is_active: boolean;
 };
 
-const authenticatedRoute = getRouteApi("/_authenticated");
-
 export function useStaffSession() {
-  const ctx = authenticatedRoute.useRouteContext() as {
+  const matches = useMatches();
+  const authenticatedMatch = matches.find((match) => match.id === "/_authenticated");
+  const ctx = authenticatedMatch?.context as {
     user: { id: string; email?: string | undefined };
     profile: StaffProfile;
-  };
+  } | undefined;
+
+  if (!ctx) {
+    throw new Error("Staff session context is unavailable outside the authenticated route.");
+  }
   return {
     user: ctx.user,
     profile: ctx.profile,
