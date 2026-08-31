@@ -1,4 +1,4 @@
-import { getRouteApi } from "@tanstack/react-router";
+import { useRouteContext } from "@tanstack/react-router";
 
 export type StaffProfile = {
   id: string;
@@ -10,10 +10,8 @@ export type StaffProfile = {
   is_active: boolean;
 };
 
-const authenticatedRoute = getRouteApi("/_authenticated");
-
 export function useStaffSession() {
-  const ctx = authenticatedRoute.useRouteContext() as {
+  const ctx = useRouteContext({ from: "/_authenticated" }) as {
     user: { id: string; email?: string | undefined };
     profile: StaffProfile;
   };
