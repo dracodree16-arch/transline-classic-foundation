@@ -14,6 +14,7 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthDisabledRouteImport } from './routes/auth_.disabled'
 import { Route as AuthPendingRouteImport } from './routes/auth_.pending'
 import { Route as AuthenticatedBookingsIndexRouteImport } from './routes/_authenticated/bookings.index'
 import { Route as AuthenticatedBookingsRefRouteImport } from './routes/_authenticated/bookings.$ref'
@@ -80,6 +81,11 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthDisabledRoute = AuthDisabledRouteImport.update({
+  id: '/auth_/disabled',
+  path: '/auth/disabled',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AuthPendingRoute = AuthPendingRouteImport.update({
   id: '/auth_/pending',
@@ -325,6 +331,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/reset-password': typeof ResetPasswordRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/auth/disabled': typeof AuthDisabledRoute
   '/auth/pending': typeof AuthPendingRoute
   '/bookings/$ref': typeof AuthenticatedBookingsRefRoute
   '/bookings/dispatch': typeof AuthenticatedBookingsDispatchRoute
@@ -373,6 +380,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/reset-password': typeof ResetPasswordRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/auth/disabled': typeof AuthDisabledRoute
   '/auth/pending': typeof AuthPendingRoute
   '/bookings/$ref': typeof AuthenticatedBookingsRefRoute
   '/bookings/dispatch': typeof AuthenticatedBookingsDispatchRoute
@@ -423,6 +431,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/reset-password': typeof ResetPasswordRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/auth_/disabled': typeof AuthDisabledRoute
   '/auth_/pending': typeof AuthPendingRoute
   '/_authenticated/bookings/$ref': typeof AuthenticatedBookingsRefRoute
   '/_authenticated/bookings/dispatch': typeof AuthenticatedBookingsDispatchRoute
@@ -473,6 +482,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/reset-password'
     | '/dashboard'
+    | '/auth/disabled'
     | '/auth/pending'
     | '/bookings/$ref'
     | '/bookings/dispatch'
@@ -521,6 +531,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/reset-password'
     | '/dashboard'
+    | '/auth/disabled'
     | '/auth/pending'
     | '/bookings/$ref'
     | '/bookings/dispatch'
@@ -570,6 +581,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/reset-password'
     | '/_authenticated/dashboard'
+    | '/auth_/disabled'
     | '/auth_/pending'
     | '/_authenticated/bookings/$ref'
     | '/_authenticated/bookings/dispatch'
@@ -619,6 +631,7 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
+  AuthDisabledRoute: typeof AuthDisabledRoute
   AuthPendingRoute: typeof AuthPendingRoute
 }
 
@@ -658,6 +671,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/dashboard'
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/auth_/disabled': {
+      id: '/auth_/disabled'
+      path: '/auth/disabled'
+      fullPath: '/auth/disabled'
+      preLoaderRoute: typeof AuthDisabledRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/auth_/pending': {
       id: '/auth_/pending'
@@ -1054,6 +1074,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
   ResetPasswordRoute: ResetPasswordRoute,
+  AuthDisabledRoute: AuthDisabledRoute,
   AuthPendingRoute: AuthPendingRoute,
 }
 export const routeTree = rootRouteImport
