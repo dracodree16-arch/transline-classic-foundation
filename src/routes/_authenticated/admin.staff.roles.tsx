@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { APP_ROLES } from "@/lib/nav";
 import { Page, SectionCard, DemoNotice } from "@/components/page-shell";
 
-export const Route = createFileRoute("/_authenticated/staff/roles")({
+export const Route = createFileRoute("/_authenticated/admin/staff/roles")({
   head: () => ({
     meta: [
       { title: "Roles & Permissions | Transline Classic TMS" },

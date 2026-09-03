@@ -587,6 +587,11 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      archive_booking: {
+        Args: { _booking_id: string; _reason?: string }
+        Returns: undefined
+      }
+      archive_trip: { Args: { _trip_id: string }; Returns: undefined }
       auth_branch: { Args: never; Returns: string }
       auth_role: {
         Args: never
@@ -622,6 +627,8 @@ export type Database = {
       }
       is_main_admin: { Args: never; Returns: boolean }
       is_staff_admin: { Args: { _user_id: string }; Returns: boolean }
+      restore_booking: { Args: { _booking_id: string }; Returns: undefined }
+      restore_trip: { Args: { _trip_id: string }; Returns: undefined }
       track_booking: {
         Args: { _booking_ref: string; _phone: string }
         Returns: {

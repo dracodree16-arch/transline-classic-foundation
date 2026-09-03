@@ -20,7 +20,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { listStaff, updateStaff } from "@/lib/staff.functions";
 import { useStaffSession } from "@/lib/session";
 
-export const Route = createFileRoute("/_authenticated/staff/$id")({
+export const Route = createFileRoute("/_authenticated/admin/staff/$id")({
   beforeLoad: ({ context }) => {
     if (context.profile.role !== "admin") throw redirect({ to: "/dashboard" });
   },

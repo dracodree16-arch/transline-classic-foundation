@@ -13,7 +13,10 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthDisabledRouteImport } from './routes/auth_.disabled'
+import { Route as AuthPendingRouteImport } from './routes/auth_.pending'
 import { Route as AuthenticatedBookingsIndexRouteImport } from './routes/_authenticated/bookings.index'
 import { Route as AuthenticatedBookingsRefRouteImport } from './routes/_authenticated/bookings.$ref'
 import { Route as AuthenticatedBookingsDispatchRouteImport } from './routes/_authenticated/bookings.dispatch'
@@ -48,13 +51,13 @@ import { Route as AuthenticatedRoutesNewRouteImport } from './routes/_authentica
 import { Route as AuthenticatedSettingsIndexRouteImport } from './routes/_authenticated/settings.index'
 import { Route as AuthenticatedSettingsProfileRouteImport } from './routes/_authenticated/settings.profile'
 import { Route as AuthenticatedSettingsSystemRouteImport } from './routes/_authenticated/settings.system'
-import { Route as AuthenticatedStaffIndexRouteImport } from './routes/_authenticated/staff.index'
-import { Route as AuthenticatedStaffIdRouteImport } from './routes/_authenticated/staff.$id'
-import { Route as AuthenticatedStaffNewRouteImport } from './routes/_authenticated/staff.new'
-import { Route as AuthenticatedStaffRolesRouteImport } from './routes/_authenticated/staff.roles'
 import { Route as AuthenticatedTripsIndexRouteImport } from './routes/_authenticated/trips.index'
 import { Route as AuthenticatedTripsIdRouteImport } from './routes/_authenticated/trips.$id'
 import { Route as AuthenticatedTripsNewRouteImport } from './routes/_authenticated/trips.new'
+import { Route as AuthenticatedAdminStaffIndexRouteImport } from './routes/_authenticated/admin.staff.index'
+import { Route as AuthenticatedAdminStaffIdRouteImport } from './routes/_authenticated/admin.staff.$id'
+import { Route as AuthenticatedAdminStaffNewRouteImport } from './routes/_authenticated/admin.staff.new'
+import { Route as AuthenticatedAdminStaffRolesRouteImport } from './routes/_authenticated/admin.staff.roles'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -75,10 +78,25 @@ const ResetPasswordRoute = ResetPasswordRouteImport.update({
   path: '/reset-password',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthDisabledRoute = AuthDisabledRouteImport.update({
+  id: '/auth_/disabled',
+  path: '/auth/disabled',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthPendingRoute = AuthPendingRouteImport.update({
+  id: '/auth_/pending',
+  path: '/auth/pending',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedBookingsIndexRoute =
   AuthenticatedBookingsIndexRouteImport.update({
@@ -278,26 +296,6 @@ const AuthenticatedSettingsSystemRoute =
     path: '/settings/system',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
-const AuthenticatedStaffIndexRoute = AuthenticatedStaffIndexRouteImport.update({
-  id: '/staff/',
-  path: '/staff/',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
-const AuthenticatedStaffIdRoute = AuthenticatedStaffIdRouteImport.update({
-  id: '/staff/$id',
-  path: '/staff/$id',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
-const AuthenticatedStaffNewRoute = AuthenticatedStaffNewRouteImport.update({
-  id: '/staff/new',
-  path: '/staff/new',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
-const AuthenticatedStaffRolesRoute = AuthenticatedStaffRolesRouteImport.update({
-  id: '/staff/roles',
-  path: '/staff/roles',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
 const AuthenticatedTripsIndexRoute = AuthenticatedTripsIndexRouteImport.update({
   id: '/trips/',
   path: '/trips/',
@@ -313,12 +311,39 @@ const AuthenticatedTripsNewRoute = AuthenticatedTripsNewRouteImport.update({
   path: '/trips/new',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedAdminStaffIndexRoute =
+  AuthenticatedAdminStaffIndexRouteImport.update({
+    id: '/staff/',
+    path: '/staff/',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminStaffIdRoute =
+  AuthenticatedAdminStaffIdRouteImport.update({
+    id: '/staff/$id',
+    path: '/staff/$id',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminStaffNewRoute =
+  AuthenticatedAdminStaffNewRouteImport.update({
+    id: '/staff/new',
+    path: '/staff/new',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminStaffRolesRoute =
+  AuthenticatedAdminStaffRolesRouteImport.update({
+    id: '/staff/roles',
+    path: '/staff/roles',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/auth/disabled': typeof AuthDisabledRoute
+  '/auth/pending': typeof AuthPendingRoute
   '/bookings/$ref': typeof AuthenticatedBookingsRefRoute
   '/bookings/dispatch': typeof AuthenticatedBookingsDispatchRoute
   '/bookings/manifest': typeof AuthenticatedBookingsManifestRoute
@@ -345,9 +370,6 @@ export interface FileRoutesByFullPath {
   '/routes/new': typeof AuthenticatedRoutesNewRoute
   '/settings/profile': typeof AuthenticatedSettingsProfileRoute
   '/settings/system': typeof AuthenticatedSettingsSystemRoute
-  '/staff/$id': typeof AuthenticatedStaffIdRoute
-  '/staff/new': typeof AuthenticatedStaffNewRoute
-  '/staff/roles': typeof AuthenticatedStaffRolesRoute
   '/trips/$id': typeof AuthenticatedTripsIdRoute
   '/trips/new': typeof AuthenticatedTripsNewRoute
   '/bookings/': typeof AuthenticatedBookingsIndexRoute
@@ -358,14 +380,20 @@ export interface FileRoutesByFullPath {
   '/reports/': typeof AuthenticatedReportsIndexRoute
   '/routes/': typeof AuthenticatedRoutesIndexRoute
   '/settings/': typeof AuthenticatedSettingsIndexRoute
-  '/staff/': typeof AuthenticatedStaffIndexRoute
   '/trips/': typeof AuthenticatedTripsIndexRoute
+  '/admin/staff/$id': typeof AuthenticatedAdminStaffIdRoute
+  '/admin/staff/new': typeof AuthenticatedAdminStaffNewRoute
+  '/admin/staff/roles': typeof AuthenticatedAdminStaffRolesRoute
+  '/admin/staff/': typeof AuthenticatedAdminStaffIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/auth/disabled': typeof AuthDisabledRoute
+  '/auth/pending': typeof AuthPendingRoute
   '/bookings/$ref': typeof AuthenticatedBookingsRefRoute
   '/bookings/dispatch': typeof AuthenticatedBookingsDispatchRoute
   '/bookings/manifest': typeof AuthenticatedBookingsManifestRoute
@@ -392,9 +420,6 @@ export interface FileRoutesByTo {
   '/routes/new': typeof AuthenticatedRoutesNewRoute
   '/settings/profile': typeof AuthenticatedSettingsProfileRoute
   '/settings/system': typeof AuthenticatedSettingsSystemRoute
-  '/staff/$id': typeof AuthenticatedStaffIdRoute
-  '/staff/new': typeof AuthenticatedStaffNewRoute
-  '/staff/roles': typeof AuthenticatedStaffRolesRoute
   '/trips/$id': typeof AuthenticatedTripsIdRoute
   '/trips/new': typeof AuthenticatedTripsNewRoute
   '/bookings': typeof AuthenticatedBookingsIndexRoute
@@ -405,8 +430,11 @@ export interface FileRoutesByTo {
   '/reports': typeof AuthenticatedReportsIndexRoute
   '/routes': typeof AuthenticatedRoutesIndexRoute
   '/settings': typeof AuthenticatedSettingsIndexRoute
-  '/staff': typeof AuthenticatedStaffIndexRoute
   '/trips': typeof AuthenticatedTripsIndexRoute
+  '/admin/staff/$id': typeof AuthenticatedAdminStaffIdRoute
+  '/admin/staff/new': typeof AuthenticatedAdminStaffNewRoute
+  '/admin/staff/roles': typeof AuthenticatedAdminStaffRolesRoute
+  '/admin/staff': typeof AuthenticatedAdminStaffIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -414,7 +442,10 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/auth_/disabled': typeof AuthDisabledRoute
+  '/auth_/pending': typeof AuthPendingRoute
   '/_authenticated/bookings/$ref': typeof AuthenticatedBookingsRefRoute
   '/_authenticated/bookings/dispatch': typeof AuthenticatedBookingsDispatchRoute
   '/_authenticated/bookings/manifest': typeof AuthenticatedBookingsManifestRoute
@@ -441,9 +472,6 @@ export interface FileRoutesById {
   '/_authenticated/routes/new': typeof AuthenticatedRoutesNewRoute
   '/_authenticated/settings/profile': typeof AuthenticatedSettingsProfileRoute
   '/_authenticated/settings/system': typeof AuthenticatedSettingsSystemRoute
-  '/_authenticated/staff/$id': typeof AuthenticatedStaffIdRoute
-  '/_authenticated/staff/new': typeof AuthenticatedStaffNewRoute
-  '/_authenticated/staff/roles': typeof AuthenticatedStaffRolesRoute
   '/_authenticated/trips/$id': typeof AuthenticatedTripsIdRoute
   '/_authenticated/trips/new': typeof AuthenticatedTripsNewRoute
   '/_authenticated/bookings/': typeof AuthenticatedBookingsIndexRoute
@@ -454,8 +482,11 @@ export interface FileRoutesById {
   '/_authenticated/reports/': typeof AuthenticatedReportsIndexRoute
   '/_authenticated/routes/': typeof AuthenticatedRoutesIndexRoute
   '/_authenticated/settings/': typeof AuthenticatedSettingsIndexRoute
-  '/_authenticated/staff/': typeof AuthenticatedStaffIndexRoute
   '/_authenticated/trips/': typeof AuthenticatedTripsIndexRoute
+  '/_authenticated/admin/staff/$id': typeof AuthenticatedAdminStaffIdRoute
+  '/_authenticated/admin/staff/new': typeof AuthenticatedAdminStaffNewRoute
+  '/_authenticated/admin/staff/roles': typeof AuthenticatedAdminStaffRolesRoute
+  '/_authenticated/admin/staff/': typeof AuthenticatedAdminStaffIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -463,7 +494,10 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/reset-password'
+    | '/admin'
     | '/dashboard'
+    | '/auth/disabled'
+    | '/auth/pending'
     | '/bookings/$ref'
     | '/bookings/dispatch'
     | '/bookings/manifest'
@@ -490,9 +524,6 @@ export interface FileRouteTypes {
     | '/routes/new'
     | '/settings/profile'
     | '/settings/system'
-    | '/staff/$id'
-    | '/staff/new'
-    | '/staff/roles'
     | '/trips/$id'
     | '/trips/new'
     | '/bookings/'
@@ -503,14 +534,20 @@ export interface FileRouteTypes {
     | '/reports/'
     | '/routes/'
     | '/settings/'
-    | '/staff/'
     | '/trips/'
+    | '/admin/staff/$id'
+    | '/admin/staff/new'
+    | '/admin/staff/roles'
+    | '/admin/staff/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/auth'
     | '/reset-password'
+    | '/admin'
     | '/dashboard'
+    | '/auth/disabled'
+    | '/auth/pending'
     | '/bookings/$ref'
     | '/bookings/dispatch'
     | '/bookings/manifest'
@@ -537,9 +574,6 @@ export interface FileRouteTypes {
     | '/routes/new'
     | '/settings/profile'
     | '/settings/system'
-    | '/staff/$id'
-    | '/staff/new'
-    | '/staff/roles'
     | '/trips/$id'
     | '/trips/new'
     | '/bookings'
@@ -550,15 +584,21 @@ export interface FileRouteTypes {
     | '/reports'
     | '/routes'
     | '/settings'
-    | '/staff'
     | '/trips'
+    | '/admin/staff/$id'
+    | '/admin/staff/new'
+    | '/admin/staff/roles'
+    | '/admin/staff'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
     | '/auth'
     | '/reset-password'
+    | '/_authenticated/admin'
     | '/_authenticated/dashboard'
+    | '/auth_/disabled'
+    | '/auth_/pending'
     | '/_authenticated/bookings/$ref'
     | '/_authenticated/bookings/dispatch'
     | '/_authenticated/bookings/manifest'
@@ -585,9 +625,6 @@ export interface FileRouteTypes {
     | '/_authenticated/routes/new'
     | '/_authenticated/settings/profile'
     | '/_authenticated/settings/system'
-    | '/_authenticated/staff/$id'
-    | '/_authenticated/staff/new'
-    | '/_authenticated/staff/roles'
     | '/_authenticated/trips/$id'
     | '/_authenticated/trips/new'
     | '/_authenticated/bookings/'
@@ -598,8 +635,11 @@ export interface FileRouteTypes {
     | '/_authenticated/reports/'
     | '/_authenticated/routes/'
     | '/_authenticated/settings/'
-    | '/_authenticated/staff/'
     | '/_authenticated/trips/'
+    | '/_authenticated/admin/staff/$id'
+    | '/_authenticated/admin/staff/new'
+    | '/_authenticated/admin/staff/roles'
+    | '/_authenticated/admin/staff/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -607,6 +647,8 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
+  AuthDisabledRoute: typeof AuthDisabledRoute
+  AuthPendingRoute: typeof AuthPendingRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -639,12 +681,33 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/admin': {
+      id: '/_authenticated/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AuthenticatedAdminRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/dashboard': {
       id: '/_authenticated/dashboard'
       path: '/dashboard'
       fullPath: '/dashboard'
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/auth_/disabled': {
+      id: '/auth_/disabled'
+      path: '/auth/disabled'
+      fullPath: '/auth/disabled'
+      preLoaderRoute: typeof AuthDisabledRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth_/pending': {
+      id: '/auth_/pending'
+      path: '/auth/pending'
+      fullPath: '/auth/pending'
+      preLoaderRoute: typeof AuthPendingRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/_authenticated/bookings/': {
       id: '/_authenticated/bookings/'
@@ -884,34 +947,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSettingsSystemRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/staff/': {
-      id: '/_authenticated/staff/'
-      path: '/staff'
-      fullPath: '/staff/'
-      preLoaderRoute: typeof AuthenticatedStaffIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/staff/$id': {
-      id: '/_authenticated/staff/$id'
-      path: '/staff/$id'
-      fullPath: '/staff/$id'
-      preLoaderRoute: typeof AuthenticatedStaffIdRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/staff/new': {
-      id: '/_authenticated/staff/new'
-      path: '/staff/new'
-      fullPath: '/staff/new'
-      preLoaderRoute: typeof AuthenticatedStaffNewRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/staff/roles': {
-      id: '/_authenticated/staff/roles'
-      path: '/staff/roles'
-      fullPath: '/staff/roles'
-      preLoaderRoute: typeof AuthenticatedStaffRolesRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
     '/_authenticated/trips/': {
       id: '/_authenticated/trips/'
       path: '/trips'
@@ -933,10 +968,56 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedTripsNewRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin/staff/': {
+      id: '/_authenticated/admin/staff/'
+      path: '/staff'
+      fullPath: '/admin/staff/'
+      preLoaderRoute: typeof AuthenticatedAdminStaffIndexRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/staff/$id': {
+      id: '/_authenticated/admin/staff/$id'
+      path: '/staff/$id'
+      fullPath: '/admin/staff/$id'
+      preLoaderRoute: typeof AuthenticatedAdminStaffIdRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/staff/new': {
+      id: '/_authenticated/admin/staff/new'
+      path: '/staff/new'
+      fullPath: '/admin/staff/new'
+      preLoaderRoute: typeof AuthenticatedAdminStaffNewRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/staff/roles': {
+      id: '/_authenticated/admin/staff/roles'
+      path: '/staff/roles'
+      fullPath: '/admin/staff/roles'
+      preLoaderRoute: typeof AuthenticatedAdminStaffRolesRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
   }
 }
 
+interface AuthenticatedAdminRouteChildren {
+  AuthenticatedAdminStaffIdRoute: typeof AuthenticatedAdminStaffIdRoute
+  AuthenticatedAdminStaffNewRoute: typeof AuthenticatedAdminStaffNewRoute
+  AuthenticatedAdminStaffRolesRoute: typeof AuthenticatedAdminStaffRolesRoute
+  AuthenticatedAdminStaffIndexRoute: typeof AuthenticatedAdminStaffIndexRoute
+}
+
+const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
+  AuthenticatedAdminStaffIdRoute: AuthenticatedAdminStaffIdRoute,
+  AuthenticatedAdminStaffNewRoute: AuthenticatedAdminStaffNewRoute,
+  AuthenticatedAdminStaffRolesRoute: AuthenticatedAdminStaffRolesRoute,
+  AuthenticatedAdminStaffIndexRoute: AuthenticatedAdminStaffIndexRoute,
+}
+
+const AuthenticatedAdminRouteWithChildren =
+  AuthenticatedAdminRoute._addFileChildren(AuthenticatedAdminRouteChildren)
+
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAdminRoute: typeof AuthenticatedAdminRouteWithChildren
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedBookingsRefRoute: typeof AuthenticatedBookingsRefRoute
   AuthenticatedBookingsDispatchRoute: typeof AuthenticatedBookingsDispatchRoute
@@ -964,9 +1045,6 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedRoutesNewRoute: typeof AuthenticatedRoutesNewRoute
   AuthenticatedSettingsProfileRoute: typeof AuthenticatedSettingsProfileRoute
   AuthenticatedSettingsSystemRoute: typeof AuthenticatedSettingsSystemRoute
-  AuthenticatedStaffIdRoute: typeof AuthenticatedStaffIdRoute
-  AuthenticatedStaffNewRoute: typeof AuthenticatedStaffNewRoute
-  AuthenticatedStaffRolesRoute: typeof AuthenticatedStaffRolesRoute
   AuthenticatedTripsIdRoute: typeof AuthenticatedTripsIdRoute
   AuthenticatedTripsNewRoute: typeof AuthenticatedTripsNewRoute
   AuthenticatedBookingsIndexRoute: typeof AuthenticatedBookingsIndexRoute
@@ -977,11 +1055,11 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedReportsIndexRoute: typeof AuthenticatedReportsIndexRoute
   AuthenticatedRoutesIndexRoute: typeof AuthenticatedRoutesIndexRoute
   AuthenticatedSettingsIndexRoute: typeof AuthenticatedSettingsIndexRoute
-  AuthenticatedStaffIndexRoute: typeof AuthenticatedStaffIndexRoute
   AuthenticatedTripsIndexRoute: typeof AuthenticatedTripsIndexRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAdminRoute: AuthenticatedAdminRouteWithChildren,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedBookingsRefRoute: AuthenticatedBookingsRefRoute,
   AuthenticatedBookingsDispatchRoute: AuthenticatedBookingsDispatchRoute,
@@ -1009,9 +1087,6 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedRoutesNewRoute: AuthenticatedRoutesNewRoute,
   AuthenticatedSettingsProfileRoute: AuthenticatedSettingsProfileRoute,
   AuthenticatedSettingsSystemRoute: AuthenticatedSettingsSystemRoute,
-  AuthenticatedStaffIdRoute: AuthenticatedStaffIdRoute,
-  AuthenticatedStaffNewRoute: AuthenticatedStaffNewRoute,
-  AuthenticatedStaffRolesRoute: AuthenticatedStaffRolesRoute,
   AuthenticatedTripsIdRoute: AuthenticatedTripsIdRoute,
   AuthenticatedTripsNewRoute: AuthenticatedTripsNewRoute,
   AuthenticatedBookingsIndexRoute: AuthenticatedBookingsIndexRoute,
@@ -1022,7 +1097,6 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedReportsIndexRoute: AuthenticatedReportsIndexRoute,
   AuthenticatedRoutesIndexRoute: AuthenticatedRoutesIndexRoute,
   AuthenticatedSettingsIndexRoute: AuthenticatedSettingsIndexRoute,
-  AuthenticatedStaffIndexRoute: AuthenticatedStaffIndexRoute,
   AuthenticatedTripsIndexRoute: AuthenticatedTripsIndexRoute,
 }
 
@@ -1034,6 +1108,8 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
   ResetPasswordRoute: ResetPasswordRoute,
+  AuthDisabledRoute: AuthDisabledRoute,
+  AuthPendingRoute: AuthPendingRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

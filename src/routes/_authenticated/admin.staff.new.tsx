@@ -19,7 +19,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { createClerk } from "@/lib/staff.functions";
 import { useStaffSession } from "@/lib/session";
 
-export const Route = createFileRoute("/_authenticated/staff/new")({
+export const Route = createFileRoute("/_authenticated/admin/staff/new")({
   beforeLoad: ({ context }) => {
     if (context.profile.role !== "admin") throw redirect({ to: "/dashboard" });
   },
@@ -71,7 +71,7 @@ function StaffNewPage() {
     onSuccess: async () => {
       toast.success("Staff account created");
       await queryClient.invalidateQueries({ queryKey: ["staff"] });
-      navigate({ to: "/staff" });
+      navigate({ to: "/admin/staff" });
     },
     onError: (e: Error) => toast.error(e.message),
   });

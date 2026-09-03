@@ -22,7 +22,7 @@ import { Page, SectionCard } from "@/components/page-shell";
 import { listStaff, resetStaffPassword, updateStaff } from "@/lib/staff.functions";
 import { useStaffSession } from "@/lib/session";
 
-export const Route = createFileRoute("/_authenticated/staff/")({
+export const Route = createFileRoute("/_authenticated/admin/staff/")({
   beforeLoad: ({ context }) => {
     if (context.profile.role !== "admin") throw redirect({ to: "/dashboard" });
   },
@@ -90,7 +90,7 @@ function StaffIndexPage() {
         title="Staff accounts"
         action={
           <Button asChild size="sm">
-            <Link to="/staff/new">
+            <Link to="/admin/staff/new">
               <Plus className="mr-1 size-4" /> Add Clerk
             </Link>
           </Button>
@@ -142,7 +142,7 @@ function StaffIndexPage() {
                           <KeyRound className="mr-1 size-3.5" /> Reset
                         </Button>
                         <Button size="sm" variant="ghost" asChild>
-                          <Link to="/staff/$id" params={{ id: row.id }}>
+                          <Link to="/admin/staff/$id" params={{ id: row.id }}>
                             Edit
                           </Link>
                         </Button>
