@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthDisabledRouteImport } from './routes/auth_.disabled'
 import { Route as AuthPendingRouteImport } from './routes/auth_.pending'
@@ -76,6 +77,11 @@ const ResetPasswordRoute = ResetPasswordRouteImport.update({
   id: '/reset-password',
   path: '/reset-password',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
@@ -307,33 +313,34 @@ const AuthenticatedTripsNewRoute = AuthenticatedTripsNewRouteImport.update({
 } as any)
 const AuthenticatedAdminStaffIndexRoute =
   AuthenticatedAdminStaffIndexRouteImport.update({
-    id: '/admin/staff/',
-    path: '/admin/staff/',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/staff/',
+    path: '/staff/',
+    getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
 const AuthenticatedAdminStaffIdRoute =
   AuthenticatedAdminStaffIdRouteImport.update({
-    id: '/admin/staff/$id',
-    path: '/admin/staff/$id',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/staff/$id',
+    path: '/staff/$id',
+    getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
 const AuthenticatedAdminStaffNewRoute =
   AuthenticatedAdminStaffNewRouteImport.update({
-    id: '/admin/staff/new',
-    path: '/admin/staff/new',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/staff/new',
+    path: '/staff/new',
+    getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
 const AuthenticatedAdminStaffRolesRoute =
   AuthenticatedAdminStaffRolesRouteImport.update({
-    id: '/admin/staff/roles',
-    path: '/admin/staff/roles',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/staff/roles',
+    path: '/staff/roles',
+    getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/auth/disabled': typeof AuthDisabledRoute
   '/auth/pending': typeof AuthPendingRoute
@@ -383,6 +390,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/auth/disabled': typeof AuthDisabledRoute
   '/auth/pending': typeof AuthPendingRoute
@@ -434,6 +442,7 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/auth_/disabled': typeof AuthDisabledRoute
   '/auth_/pending': typeof AuthPendingRoute
@@ -485,6 +494,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/reset-password'
+    | '/admin'
     | '/dashboard'
     | '/auth/disabled'
     | '/auth/pending'
@@ -534,6 +544,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/reset-password'
+    | '/admin'
     | '/dashboard'
     | '/auth/disabled'
     | '/auth/pending'
@@ -584,6 +595,7 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/auth'
     | '/reset-password'
+    | '/_authenticated/admin'
     | '/_authenticated/dashboard'
     | '/auth_/disabled'
     | '/auth_/pending'
@@ -668,6 +680,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/reset-password'
       preLoaderRoute: typeof ResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/admin': {
+      id: '/_authenticated/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AuthenticatedAdminRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/dashboard': {
       id: '/_authenticated/dashboard'
@@ -951,36 +970,54 @@ declare module '@tanstack/react-router' {
     }
     '/_authenticated/admin/staff/': {
       id: '/_authenticated/admin/staff/'
-      path: '/admin/staff'
+      path: '/staff'
       fullPath: '/admin/staff/'
       preLoaderRoute: typeof AuthenticatedAdminStaffIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedAdminRoute
     }
     '/_authenticated/admin/staff/$id': {
       id: '/_authenticated/admin/staff/$id'
-      path: '/admin/staff/$id'
+      path: '/staff/$id'
       fullPath: '/admin/staff/$id'
       preLoaderRoute: typeof AuthenticatedAdminStaffIdRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedAdminRoute
     }
     '/_authenticated/admin/staff/new': {
       id: '/_authenticated/admin/staff/new'
-      path: '/admin/staff/new'
+      path: '/staff/new'
       fullPath: '/admin/staff/new'
       preLoaderRoute: typeof AuthenticatedAdminStaffNewRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedAdminRoute
     }
     '/_authenticated/admin/staff/roles': {
       id: '/_authenticated/admin/staff/roles'
-      path: '/admin/staff/roles'
+      path: '/staff/roles'
       fullPath: '/admin/staff/roles'
       preLoaderRoute: typeof AuthenticatedAdminStaffRolesRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedAdminRoute
     }
   }
 }
 
+interface AuthenticatedAdminRouteChildren {
+  AuthenticatedAdminStaffIdRoute: typeof AuthenticatedAdminStaffIdRoute
+  AuthenticatedAdminStaffNewRoute: typeof AuthenticatedAdminStaffNewRoute
+  AuthenticatedAdminStaffRolesRoute: typeof AuthenticatedAdminStaffRolesRoute
+  AuthenticatedAdminStaffIndexRoute: typeof AuthenticatedAdminStaffIndexRoute
+}
+
+const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
+  AuthenticatedAdminStaffIdRoute: AuthenticatedAdminStaffIdRoute,
+  AuthenticatedAdminStaffNewRoute: AuthenticatedAdminStaffNewRoute,
+  AuthenticatedAdminStaffRolesRoute: AuthenticatedAdminStaffRolesRoute,
+  AuthenticatedAdminStaffIndexRoute: AuthenticatedAdminStaffIndexRoute,
+}
+
+const AuthenticatedAdminRouteWithChildren =
+  AuthenticatedAdminRoute._addFileChildren(AuthenticatedAdminRouteChildren)
+
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAdminRoute: typeof AuthenticatedAdminRouteWithChildren
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedBookingsRefRoute: typeof AuthenticatedBookingsRefRoute
   AuthenticatedBookingsDispatchRoute: typeof AuthenticatedBookingsDispatchRoute
@@ -1019,13 +1056,10 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedRoutesIndexRoute: typeof AuthenticatedRoutesIndexRoute
   AuthenticatedSettingsIndexRoute: typeof AuthenticatedSettingsIndexRoute
   AuthenticatedTripsIndexRoute: typeof AuthenticatedTripsIndexRoute
-  AuthenticatedAdminStaffIdRoute: typeof AuthenticatedAdminStaffIdRoute
-  AuthenticatedAdminStaffNewRoute: typeof AuthenticatedAdminStaffNewRoute
-  AuthenticatedAdminStaffRolesRoute: typeof AuthenticatedAdminStaffRolesRoute
-  AuthenticatedAdminStaffIndexRoute: typeof AuthenticatedAdminStaffIndexRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAdminRoute: AuthenticatedAdminRouteWithChildren,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedBookingsRefRoute: AuthenticatedBookingsRefRoute,
   AuthenticatedBookingsDispatchRoute: AuthenticatedBookingsDispatchRoute,
@@ -1064,10 +1098,6 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedRoutesIndexRoute: AuthenticatedRoutesIndexRoute,
   AuthenticatedSettingsIndexRoute: AuthenticatedSettingsIndexRoute,
   AuthenticatedTripsIndexRoute: AuthenticatedTripsIndexRoute,
-  AuthenticatedAdminStaffIdRoute: AuthenticatedAdminStaffIdRoute,
-  AuthenticatedAdminStaffNewRoute: AuthenticatedAdminStaffNewRoute,
-  AuthenticatedAdminStaffRolesRoute: AuthenticatedAdminStaffRolesRoute,
-  AuthenticatedAdminStaffIndexRoute: AuthenticatedAdminStaffIndexRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
