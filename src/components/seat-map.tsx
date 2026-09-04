@@ -1,4 +1,4 @@
-import { CircleDot, CircleUserRound, DoorOpen } from "lucide-react";
+import { DoorOpen, LifeBuoy } from "lucide-react";
 
 export type SeatState = "available" | "booked" | "selected" | "blocked";
 
@@ -28,10 +28,11 @@ export function buildSeatLayout(capacity: number): { rows: string[][]; backRow: 
 const seatClass: Record<SeatState, string> = {
   available: "bg-seat-available text-seat-available-foreground hover:brightness-105",
   booked: "bg-seat-booked text-seat-booked-foreground cursor-not-allowed",
-  selected: "bg-seat-selected text-seat-selected-foreground ring-2 ring-offset-2 ring-seat-selected",
+  selected: "bg-seat-selected text-seat-selected-foreground",
   blocked: "bg-seat-blocked text-seat-blocked-foreground cursor-not-allowed",
 };
 
+/** An armchair-shaped seat: two armrests, a padded back and the seat number. */
 function Seat({
   seat,
   state,
@@ -50,16 +51,30 @@ function Seat({
       disabled={!interactive}
       onClick={interactive ? () => onSelect?.(seat) : undefined}
       className={[
-        "relative flex h-10 w-10 items-center justify-center rounded-lg rounded-t-md border border-border/40 text-xs font-semibold shadow-sm transition-all",
-        "before:absolute before:-top-1 before:left-1/2 before:h-1.5 before:w-6 before:-translate-x-1/2 before:rounded-t-md before:bg-current before:opacity-40",
-        seatClass[state],
-        interactive ? "cursor-pointer" : "",
+        "group relative flex h-11 w-12 flex-col items-center justify-end transition-transform",
+        interactive ? "cursor-pointer hover:-translate-y-0.5" : "cursor-not-allowed",
+        state === "selected" ? "drop-shadow-[0_0_0.35rem_hsl(var(--seat-selected)/0.7)]" : "",
       ].join(" ")}
     >
-      {seat}
+      {/* backrest with the seat label */}
+      <span className="relative z-10 -mb-1 flex h-5 w-7 items-center justify-center rounded-t-md border border-border/60 bg-card text-[10px] font-semibold text-foreground">
+        {seat}
+      </span>
+      {/* armrests + cushion */}
+      <span
+        className={[
+          "flex h-6 w-full items-end justify-between rounded-md px-0 shadow-sm",
+          seatClass[state],
+        ].join(" ")}
+      >
+        <span className="h-6 w-2 rounded-l-md bg-current opacity-100" />
+        <span className="mb-0 h-3 flex-1 rounded-sm bg-card/90" />
+        <span className="h-6 w-2 rounded-r-md bg-current opacity-100" />
+      </span>
     </button>
   );
 }
+
 
 export function SeatLegend() {
   const items: { label: string; state: SeatState }[] = [
