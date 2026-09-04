@@ -124,27 +124,29 @@ function BookingsNewPage() {
   async function handleSubmit(e: { preventDefault: () => void })  {
     e.preventDefault();
 
-    if (!selectedTripId) return toast.error("Select a trip first.");
-    if (!selectedSeat) return toast.error("Select a seat.");
-    if (!passengerName.trim()) return toast.error("Passenger name is required.");
-    if (!passengerPhone.trim()) return toast.error("Phone number is required.");
-    if (!fare || Number(fare) <= 0) return toast.error("Enter a valid fare.");
+    if (!selectedTripId) { toast.error("Select a trip first."); return; }
+    if (!selectedSeat) { toast.error("Select a seat."); return; }
+    if (!passengerName.trim()) { toast.error("Passenger name is required."); return; }
+    if (!passengerPhone.trim()) { toast.error("Phone number is required."); return; }
+    if (!fare || Number(fare) <= 0) { toast.error("Enter a valid fare."); return; }
 
     setSubmitting(true);
 
     const { data: userData } = await supabase.auth.getUser();
-    const userId = userData.user?.id;
+    const userId = userData.user?.id ?? null;
 
     const { data: profile } = await supabase
       .from("profiles")
       .select("branch_id")
-      .eq("id", userId)
+      .eq("id", userId ?? "")
       .maybeSingle();
 
     if (!profile?.branch_id) {
       setSubmitting(false);
-      return toast.error("Your account has no branch assigned. Contact an admin.");
+      toast.error("Your account has no branch assigned. Contact an admin.");
+      return;
     }
+
 
     const bookingRef = `BK${Date.now().toString(36).toUpperCase()}${Math.floor(Math.random() * 900 + 100)}`;
 

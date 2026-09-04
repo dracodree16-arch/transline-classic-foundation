@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
+import { getStaffContext } from "@/lib/authz.functions";
 
 export const Route = createFileRoute("/auth")({
   ssr: false,
@@ -39,8 +40,10 @@ function AuthPage() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      if (data.session) navigate({ to: "/dashboard", replace: true });
+    supabase.auth.getSession().then(async ({ data }) => {
+      if (!data.session) return;
+      const ctx = await getStaffContext();
+      navigate({ to: ctx.landing, replace: true });
     });
   }, [navigate]);
 
@@ -48,13 +51,17 @@ function AuthPage() {
     e.preventDefault();
     setLoading(true);
     const { error } = await supabase.auth.signInWithPassword({ email, password });
-    setLoading(false);
     if (error) {
+      setLoading(false);
       toast.error(error.message);
       return;
     }
-    navigate({ to: "/dashboard", replace: true });
+    // The destination is decided by the server from the stored profile.
+    const ctx = await getStaffContext();
+    setLoading(false);
+    navigate({ to: ctx.landing, replace: true });
   }
+
 
   async function handleSignUp(e: React.FormEvent) {
     e.preventDefault();
@@ -73,7 +80,8 @@ function AuthPage() {
       return;
     }
     if (data.session) {
-      navigate({ to: "/dashboard", replace: true });
+      const ctx = await getStaffContext();
+      navigate({ to: ctx.landing, replace: true });
     } else {
       toast.success("Account created. Check your email to confirm before signing in.");
     }

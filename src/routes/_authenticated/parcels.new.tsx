@@ -65,11 +65,11 @@ function ParcelsNewPage() {
   async function handleSubmit(e: { preventDefault: () => void }) {
     e.preventDefault();
 
-    if (!senderName.trim() || !senderPhone.trim()) return toast.error("Sender name and phone are required.");
-    if (!receiverName.trim() || !receiverPhone.trim()) return toast.error("Receiver name and phone are required.");
-    if (!originBranchId) return toast.error("Select an origin branch.");
-    if (!destinationBranchId) return toast.error("Select a destination branch.");
-    if (!charge || Number(charge) <= 0) return toast.error("Enter a valid charge.");
+    if (!senderName.trim() || !senderPhone.trim()) { toast.error("Sender name and phone are required."); return; }
+    if (!receiverName.trim() || !receiverPhone.trim()) { toast.error("Receiver name and phone are required."); return; }
+    if (!originBranchId) { toast.error("Select an origin branch."); return; }
+    if (!destinationBranchId) { toast.error("Select a destination branch."); return; }
+    if (!charge || Number(charge) <= 0) { toast.error("Enter a valid charge."); return; }
 
     const trackingCode = `TP${Date.now().toString(36).toUpperCase()}${Math.floor(Math.random() * 900 + 100)}`;
     const accessPassword = Math.floor(1000 + Math.random() * 9000).toString();

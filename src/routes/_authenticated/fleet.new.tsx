@@ -62,8 +62,8 @@ function FleetNewPage() {
   async function handleSubmit(e: { preventDefault: () => void }) {
     e.preventDefault();
 
-    if (!plateNumber.trim()) return toast.error("Plate number is required.");
-    if (!capacity || Number(capacity) <= 0) return toast.error("Enter a valid seat capacity.");
+    if (!plateNumber.trim()) { toast.error("Plate number is required."); return; }
+    if (!capacity || Number(capacity) <= 0) { toast.error("Enter a valid seat capacity."); return; }
 
     setSubmitting(true);
     const { error } = await supabase.from("buses").insert({

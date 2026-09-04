@@ -67,8 +67,8 @@ function SettingsProfilePage() {
 
   async function handleSubmit(e: { preventDefault: () => void }) {
     e.preventDefault();
-    if (!userId) return toast.error("You are not signed in.");
-    if (!fullName.trim()) return toast.error("Full name is required.");
+    if (!userId) { toast.error("You are not signed in."); return; }
+    if (!fullName.trim()) { toast.error("Full name is required."); return; }
 
     setSubmitting(true);
     const { error } = await supabase

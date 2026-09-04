@@ -5,38 +5,44 @@ import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
 import { AppTopbar } from "@/components/app-topbar";
 import { roleTitle, type StaffProfile } from "@/lib/session";
+import { getStaffContext } from "@/lib/authz.functions";
 
 export const Route = createFileRoute("/_authenticated")({
   ssr: false,
-  beforeLoad: async () => {
+  beforeLoad: async ({ location }) => {
     const { data, error } = await supabase.auth.getUser();
     if (error || !data.user) throw redirect({ to: "/auth" });
 
-    const { data: row } = await supabase
-      .from("profiles")
-      .select("id, full_name, email, role, branch_id, is_active, branches(name)")
-      .eq("id", data.user.id)
-      .maybeSingle();
+    // Role, branch and status are resolved server-side from the database.
+    const ctx = await getStaffContext();
 
-    if (row && row.is_active === false) {
+    if (!ctx.is_active) {
       await supabase.auth.signOut();
-      throw redirect({ to: "/auth" });
+      throw redirect({ to: "/auth/disabled" });
+    }
+    if (ctx.role === "clerk" && !ctx.branch_id) {
+      throw redirect({ to: "/auth/pending" });
+    }
+    // Clerks never land on admin-only sections.
+    if (ctx.role === "clerk" && location.pathname.startsWith("/admin")) {
+      throw redirect({ to: "/dashboard" });
     }
 
     const profile: StaffProfile = {
-      id: data.user.id,
-      full_name: row?.full_name ?? null,
-      email: row?.email ?? data.user.email ?? null,
-      role: (row?.role as "admin" | "clerk") ?? "clerk",
-      branch_id: row?.branch_id ?? null,
-      branch_name: (row as { branches?: { name?: string } | null } | null)?.branches?.name ?? null,
-      is_active: row?.is_active ?? true,
+      id: ctx.id,
+      full_name: ctx.full_name,
+      email: ctx.email ?? data.user.email ?? null,
+      role: ctx.role,
+      branch_id: ctx.branch_id,
+      branch_name: ctx.branch_name,
+      is_active: ctx.is_active,
     };
 
     return { user: data.user, profile };
   },
   component: AppLayout,
 });
+
 
 function AppLayout() {
   const { user, profile } = Route.useRouteContext();
