@@ -10,6 +10,7 @@ import {
   Users,
   Settings,
   CalendarClock,
+  ShieldCheck,
 } from "lucide-react";
 
 export type NavItem = {
@@ -21,6 +22,7 @@ export type NavItem = {
 };
 
 export const navItems: NavItem[] = [
+  { title: "Admin Console", url: "/admin", icon: ShieldCheck, adminOnly: true },
   { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
   {
     title: "Bookings",
