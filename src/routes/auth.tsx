@@ -81,11 +81,16 @@ function AuthPage() {
       }
 
       // The destination is decided by the server from the stored profile.
-      const ctx = await getStaffContext();
-      navigate({ to: ctx.landing, replace: true });
+      try {
+        const ctx = await getStaffContext();
+        navigate({ to: ctx.landing, replace: true });
+      } catch (profileError) {
+        console.error("[v0] Staff profile unavailable after login:", profileError);
+        navigate({ to: "/dashboard", replace: true });
+      }
     } catch (error) {
-      console.error("[v0] Login failed after authentication:", error);
-      toast.error("Login succeeded, but we could not load your staff profile. Please try again.");
+      console.error("[v0] Login failed:", error);
+      toast.error("We could not sign you in. Check your email and password and try again.");
     } finally {
       setLoading(false);
     }
