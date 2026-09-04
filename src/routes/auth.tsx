@@ -40,50 +40,86 @@ function AuthPage() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    supabase.auth.getSession().then(async ({ data }) => {
-      if (!data.session) return;
-      const ctx = await getStaffContext();
-      navigate({ to: ctx.landing, replace: true });
-    });
+    let active = true;
+
+    async function redirectExistingSession() {
+      try {
+        const { data, error } = await supabase.auth.getSession();
+        if (error) throw error;
+        if (!data.session || !active) return;
+
+        const ctx = await getStaffContext();
+        if (active) navigate({ to: ctx.landing, replace: true });
+      } catch (error) {
+        console.error("[v0] Existing session redirect failed:", error);
+        if (active) await supabase.auth.signOut().catch(() => undefined);
+      }
+    }
+
+    void redirectExistingSession();
+    return () => {
+      active = false;
+    };
   }, [navigate]);
 
   async function handleSignIn(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) {
-      setLoading(false);
-      toast.error(error.message);
-      return;
-    }
-    // The destination is decided by the server from the stored profile.
-    const ctx = await getStaffContext();
-    setLoading(false);
-    navigate({ to: ctx.landing, replace: true });
-  }
 
+    try {
+      const { error } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
+      if (error) {
+        const message = error.message.toLowerCase();
+        if (message.includes("email not confirmed")) {
+          toast.error("Confirm your email before signing in.");
+        } else if (message.includes("rate limit") || message.includes("too many")) {
+          toast.error("Too many attempts. Please wait a moment and try again.");
+        } else {
+          toast.error("Invalid email or password.");
+        }
+        return;
+      }
+
+      // The destination is decided by the server from the stored profile.
+      const ctx = await getStaffContext();
+      navigate({ to: ctx.landing, replace: true });
+    } catch (error) {
+      console.error("[v0] Login failed after authentication:", error);
+      toast.error("Login succeeded, but we could not load your staff profile. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  }
 
   async function handleSignUp(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        emailRedirectTo: window.location.origin,
-        data: { full_name: fullName },
-      },
-    });
-    setLoading(false);
-    if (error) {
-      toast.error(error.message);
-      return;
-    }
-    if (data.session) {
-      const ctx = await getStaffContext();
-      navigate({ to: ctx.landing, replace: true });
-    } else {
-      toast.success("Account created. Check your email to confirm before signing in.");
+
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email: email.trim(),
+        password,
+        options: {
+          emailRedirectTo:
+            import.meta.env.NEXT_PUBLIC_DEV_SUPABASE_REDIRECT_URL ?? `${window.location.origin}/auth/callback`,
+          data: { full_name: fullName.trim() },
+        },
+      });
+      if (error) {
+        toast.error(error.message);
+        return;
+      }
+      if (data.session) {
+        const ctx = await getStaffContext();
+        navigate({ to: ctx.landing, replace: true });
+      } else {
+        toast.success("Account created. Check your email to confirm before signing in.");
+      }
+    } catch (error) {
+      console.error("[v0] Account creation failed:", error);
+      toast.error("We could not create your account. Please try again.");
+    } finally {
+      setLoading(false);
     }
   }
 
