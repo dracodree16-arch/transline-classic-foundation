@@ -133,18 +133,20 @@ function BookingsNewPage() {
     setSubmitting(true);
 
     const { data: userData } = await supabase.auth.getUser();
-    const userId = userData.user?.id;
+    const userId = userData.user?.id ?? null;
 
     const { data: profile } = await supabase
       .from("profiles")
       .select("branch_id")
-      .eq("id", userId)
+      .eq("id", userId ?? "")
       .maybeSingle();
 
     if (!profile?.branch_id) {
       setSubmitting(false);
-      { toast.error("Your account has no branch assigned. Contact an admin."); return; }
+      toast.error("Your account has no branch assigned. Contact an admin.");
+      return;
     }
+
 
     const bookingRef = `BK${Date.now().toString(36).toUpperCase()}${Math.floor(Math.random() * 900 + 100)}`;
 
