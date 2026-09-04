@@ -1,32 +1,30 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
-import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { requireAdmin } from "@/lib/authz.middleware";
 
 export const listStaff = createServerFn({ method: "GET" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireAdmin])
   .handler(async ({ context }) => {
-    const { data: allowed } = await context.supabase.rpc("is_main_admin");
-    if (!allowed) throw new Error("Forbidden — main admin only");
     const { data, error } = await context.supabase
       .from("profiles")
       .select("id, full_name, email, phone, role, is_active, branch_id, created_at, branches(name)")
       .order("created_at", { ascending: false });
     if (error) throw new Error(error.message);
-    return (data ?? []).map((r: any) => ({
-      id: r.id as string,
-      full_name: (r.full_name ?? null) as string | null,
-      email: (r.email ?? null) as string | null,
-      phone: (r.phone ?? null) as string | null,
+    return (data ?? []).map((r) => ({
+      id: r.id,
+      full_name: r.full_name ?? null,
+      email: r.email ?? null,
+      phone: r.phone ?? null,
       role: r.role as "admin" | "clerk",
-      is_active: r.is_active as boolean,
-      branch_id: (r.branch_id ?? null) as string | null,
-      branch_name: (r.branches?.name ?? null) as string | null,
+      is_active: r.is_active,
+      branch_id: r.branch_id ?? null,
+      branch_name: (r as { branches?: { name?: string } | null }).branches?.name ?? null,
     }));
   });
 
 export const createClerk = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireAdmin])
   .inputValidator((input: unknown) =>
     z
       .object({
@@ -40,8 +38,6 @@ export const createClerk = createServerFn({ method: "POST" })
       .parse(input),
   )
   .handler(async ({ data, context }) => {
-    const { data: allowed } = await context.supabase.rpc("is_main_admin");
-    if (!allowed) throw new Error("Forbidden — main admin only");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
     const { data: created, error } = await supabaseAdmin.auth.admin.createUser({
@@ -52,9 +48,8 @@ export const createClerk = createServerFn({ method: "POST" })
     });
     if (error || !created.user) throw new Error(error?.message ?? "Failed to create user");
 
-    const { error: upErr } = await supabaseAdmin
-      .from("profiles")
-      .upsert({
+    const { error: upErr } = await supabaseAdmin.from("profiles").upsert(
+      {
         id: created.user.id,
         full_name: data.full_name,
         email: data.email,
@@ -62,14 +57,24 @@ export const createClerk = createServerFn({ method: "POST" })
         branch_id: data.branch_id,
         role: data.role,
         is_active: true,
-      }, { onConflict: "id" });
+      },
+      { onConflict: "id" },
+    );
     if (upErr) throw new Error(upErr.message);
+
+    await supabaseAdmin.from("audit_logs").insert({
+      user_id: context.userId,
+      action: "create_staff",
+      entity_type: "profile",
+      entity_id: created.user.id,
+      details: { email: data.email, role: data.role, branch_id: data.branch_id },
+    });
 
     return { id: created.user.id };
   });
 
 export const updateStaff = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireAdmin])
   .inputValidator((input: unknown) =>
     z
       .object({
@@ -83,29 +88,49 @@ export const updateStaff = createServerFn({ method: "POST" })
       .parse(input),
   )
   .handler(async ({ data, context }) => {
-    const { data: allowed } = await context.supabase.rpc("is_main_admin");
-    if (!allowed) throw new Error("Forbidden — main admin only");
-    if (data.id === context.userId && data.is_active === false) {
-      throw new Error("You cannot deactivate your own account");
+    if (data.id === context.userId && (data.is_active === false || data.role === "clerk")) {
+      throw new Error("You cannot remove your own administrator access");
     }
-    const { id, ...patch } = data;
-    const { error } = await context.supabase.from("profiles").update(patch).eq("id", id);
+
+    const patch: {
+      full_name?: string;
+      phone?: string | null;
+      branch_id?: string | null;
+      role?: "admin" | "clerk";
+      is_active?: boolean;
+    } = {};
+    if (data.full_name !== undefined) patch.full_name = data.full_name;
+    if (data.phone !== undefined) patch.phone = data.phone;
+    if (data.branch_id !== undefined) patch.branch_id = data.branch_id;
+    if (data.role !== undefined) patch.role = data.role;
+    if (data.is_active !== undefined) patch.is_active = data.is_active;
+
+    // A clerk must always belong to a branch.
+    if (patch.role === "clerk" && patch.branch_id === null) {
+      throw new Error("A clerk must be assigned to a branch");
+    }
+
+    const { error } = await context.supabase.from("profiles").update(patch).eq("id", data.id);
     if (error) throw new Error(error.message);
     return { ok: true };
   });
 
 export const resetStaffPassword = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireAdmin])
   .inputValidator((input: unknown) =>
     z.object({ id: z.string().uuid(), password: z.string().min(8) }).parse(input),
   )
   .handler(async ({ data, context }) => {
-    const { data: allowed } = await context.supabase.rpc("is_main_admin");
-    if (!allowed) throw new Error("Forbidden — main admin only");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { error } = await supabaseAdmin.auth.admin.updateUserById(data.id, {
       password: data.password,
     });
     if (error) throw new Error(error.message);
+    await supabaseAdmin.from("audit_logs").insert({
+      user_id: context.userId,
+      action: "reset_staff_password",
+      entity_type: "profile",
+      entity_id: data.id,
+    });
     return { ok: true };
   });
