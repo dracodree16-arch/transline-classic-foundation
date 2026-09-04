@@ -80,7 +80,8 @@ function AuthPage() {
       return;
     }
     if (data.session) {
-      navigate({ to: "/dashboard", replace: true });
+      const ctx = await getStaffContext();
+      navigate({ to: ctx.landing, replace: true });
     } else {
       toast.success("Account created. Check your email to confirm before signing in.");
     }
