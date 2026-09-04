@@ -24,9 +24,11 @@ export const Route = createFileRoute("/_authenticated")({
       throw redirect({ to: "/auth/pending" });
     }
     // Clerks never land on admin-only sections.
-    if (ctx.role === "clerk" && location.pathname.startsWith("/admin")) {
+    const adminOnlyPrefixes = ["/admin", "/finance", "/fleet", "/routes", "/staff", "/settings/system"];
+    if (ctx.role === "clerk" && adminOnlyPrefixes.some((p) => location.pathname.startsWith(p))) {
       throw redirect({ to: "/dashboard" });
     }
+
 
     const profile: StaffProfile = {
       id: ctx.id,
