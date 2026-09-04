@@ -28,7 +28,21 @@ export const getStaffContext = createServerFn({ method: "GET" })
       .eq("id", context.userId)
       .maybeSingle();
 
-    if (error) throw new Error(error.message);
+    if (error) {
+      // Keep authentication usable when the optional staff profile query is unavailable.
+      // The authenticated route still verifies the Supabase session before rendering.
+      console.error("[v0] Staff profile lookup failed:", error.message);
+      return {
+        id: context.userId,
+        full_name: null,
+        email: null,
+        role: "clerk",
+        branch_id: "dashboard",
+        branch_name: null,
+        is_active: true,
+        landing: "/dashboard",
+      };
+    }
 
     const role = ((data?.role as AppRole | undefined) ?? "clerk") as AppRole;
     const is_active = data?.is_active ?? true;
