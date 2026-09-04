@@ -17,6 +17,7 @@ import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthDisabledRouteImport } from './routes/auth_.disabled'
 import { Route as AuthPendingRouteImport } from './routes/auth_.pending'
+import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as AuthenticatedBookingsIndexRouteImport } from './routes/_authenticated/bookings.index'
 import { Route as AuthenticatedBookingsRefRouteImport } from './routes/_authenticated/bookings.$ref'
 import { Route as AuthenticatedBookingsDispatchRouteImport } from './routes/_authenticated/bookings.dispatch'
@@ -97,6 +98,11 @@ const AuthPendingRoute = AuthPendingRouteImport.update({
   id: '/auth_/pending',
   path: '/auth/pending',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AuthenticatedAdminRoute,
 } as any)
 const AuthenticatedBookingsIndexRoute =
   AuthenticatedBookingsIndexRouteImport.update({
@@ -372,6 +378,7 @@ export interface FileRoutesByFullPath {
   '/settings/system': typeof AuthenticatedSettingsSystemRoute
   '/trips/$id': typeof AuthenticatedTripsIdRoute
   '/trips/new': typeof AuthenticatedTripsNewRoute
+  '/admin/': typeof AuthenticatedAdminIndexRoute
   '/bookings/': typeof AuthenticatedBookingsIndexRoute
   '/finance/': typeof AuthenticatedFinanceIndexRoute
   '/fleet/': typeof AuthenticatedFleetIndexRoute
@@ -390,7 +397,6 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/reset-password': typeof ResetPasswordRoute
-  '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/auth/disabled': typeof AuthDisabledRoute
   '/auth/pending': typeof AuthPendingRoute
@@ -422,6 +428,7 @@ export interface FileRoutesByTo {
   '/settings/system': typeof AuthenticatedSettingsSystemRoute
   '/trips/$id': typeof AuthenticatedTripsIdRoute
   '/trips/new': typeof AuthenticatedTripsNewRoute
+  '/admin': typeof AuthenticatedAdminIndexRoute
   '/bookings': typeof AuthenticatedBookingsIndexRoute
   '/finance': typeof AuthenticatedFinanceIndexRoute
   '/fleet': typeof AuthenticatedFleetIndexRoute
@@ -474,6 +481,7 @@ export interface FileRoutesById {
   '/_authenticated/settings/system': typeof AuthenticatedSettingsSystemRoute
   '/_authenticated/trips/$id': typeof AuthenticatedTripsIdRoute
   '/_authenticated/trips/new': typeof AuthenticatedTripsNewRoute
+  '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/bookings/': typeof AuthenticatedBookingsIndexRoute
   '/_authenticated/finance/': typeof AuthenticatedFinanceIndexRoute
   '/_authenticated/fleet/': typeof AuthenticatedFleetIndexRoute
@@ -526,6 +534,7 @@ export interface FileRouteTypes {
     | '/settings/system'
     | '/trips/$id'
     | '/trips/new'
+    | '/admin/'
     | '/bookings/'
     | '/finance/'
     | '/fleet/'
@@ -544,7 +553,6 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/reset-password'
-    | '/admin'
     | '/dashboard'
     | '/auth/disabled'
     | '/auth/pending'
@@ -576,6 +584,7 @@ export interface FileRouteTypes {
     | '/settings/system'
     | '/trips/$id'
     | '/trips/new'
+    | '/admin'
     | '/bookings'
     | '/finance'
     | '/fleet'
@@ -627,6 +636,7 @@ export interface FileRouteTypes {
     | '/_authenticated/settings/system'
     | '/_authenticated/trips/$id'
     | '/_authenticated/trips/new'
+    | '/_authenticated/admin/'
     | '/_authenticated/bookings/'
     | '/_authenticated/finance/'
     | '/_authenticated/fleet/'
@@ -708,6 +718,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/auth/pending'
       preLoaderRoute: typeof AuthPendingRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/admin/': {
+      id: '/_authenticated/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
     }
     '/_authenticated/bookings/': {
       id: '/_authenticated/bookings/'
@@ -1000,6 +1017,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedAdminRouteChildren {
+  AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
   AuthenticatedAdminStaffIdRoute: typeof AuthenticatedAdminStaffIdRoute
   AuthenticatedAdminStaffNewRoute: typeof AuthenticatedAdminStaffNewRoute
   AuthenticatedAdminStaffRolesRoute: typeof AuthenticatedAdminStaffRolesRoute
@@ -1007,6 +1025,7 @@ interface AuthenticatedAdminRouteChildren {
 }
 
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
+  AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
   AuthenticatedAdminStaffIdRoute: AuthenticatedAdminStaffIdRoute,
   AuthenticatedAdminStaffNewRoute: AuthenticatedAdminStaffNewRoute,
   AuthenticatedAdminStaffRolesRoute: AuthenticatedAdminStaffRolesRoute,

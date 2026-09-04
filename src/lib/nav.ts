@@ -105,12 +105,12 @@ export const navItems: NavItem[] = [
   {
     title: "Staff",
     adminOnly: true,
-    url: "/staff",
+    url: "/admin/staff",
     icon: Users,
     children: [
-      { title: "Clerks", url: "/staff" },
-      { title: "Add Clerk", url: "/staff/new" },
-      { title: "Roles & Permissions", url: "/staff/roles" },
+      { title: "Clerks", url: "/admin/staff" },
+      { title: "Add Clerk", url: "/admin/staff/new" },
+      { title: "Roles & Permissions", url: "/admin/staff/roles" },
     ],
   },
   {
