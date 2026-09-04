@@ -9,7 +9,6 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
-import { getStaffContext } from "@/lib/authz.functions";
 
 export const Route = createFileRoute("/auth")({
   ssr: false,
@@ -48,8 +47,7 @@ function AuthPage() {
         if (error) throw error;
         if (!data.session || !active) return;
 
-        const ctx = await getStaffContext();
-        if (active) navigate({ to: ctx.landing, replace: true });
+        if (active) navigate({ to: "/dashboard", replace: true });
       } catch (error) {
         console.error("[v0] Existing session redirect failed:", error);
         if (active) await supabase.auth.signOut().catch(() => undefined);
@@ -80,14 +78,8 @@ function AuthPage() {
         return;
       }
 
-      // The destination is decided by the server from the stored profile.
-      try {
-        const ctx = await getStaffContext();
-        navigate({ to: ctx.landing, replace: true });
-      } catch (profileError) {
-        console.error("[v0] Staff profile unavailable after login:", profileError);
-        navigate({ to: "/dashboard", replace: true });
-      }
+      // The authenticated route resolves the profile with the active browser session.
+      navigate({ to: "/dashboard", replace: true });
     } catch (error) {
       console.error("[v0] Login failed:", error);
       toast.error("We could not sign you in. Check your email and password and try again.");
@@ -115,8 +107,7 @@ function AuthPage() {
         return;
       }
       if (data.session) {
-        const ctx = await getStaffContext();
-        navigate({ to: ctx.landing, replace: true });
+        navigate({ to: "/dashboard", replace: true });
       } else {
         toast.success("Account created. Check your email to confirm before signing in.");
       }
