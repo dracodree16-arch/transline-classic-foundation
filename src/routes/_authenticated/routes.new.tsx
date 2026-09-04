@@ -59,9 +59,9 @@ function RoutesNewPage() {
   async function handleSubmit(e: { preventDefault: () => void }) {
     e.preventDefault();
 
-    if (!originBranchId) return toast.error("Select an origin branch.");
-    if (!destination.trim()) return toast.error("Destination is required.");
-    if (!baseFare || Number(baseFare) <= 0) return toast.error("Enter a valid base fare.");
+    if (!originBranchId) { toast.error("Select an origin branch."); return; }
+    if (!destination.trim()) { toast.error("Destination is required."); return; }
+    if (!baseFare || Number(baseFare) <= 0) { toast.error("Enter a valid base fare."); return; }
 
     setSubmitting(true);
     const { error } = await supabase.from("routes").insert({

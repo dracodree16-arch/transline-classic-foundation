@@ -96,7 +96,7 @@ function BookingsRefPage() {
 
   async function handleCollectPayment() {
     if (!booking) return;
-    if (!phone.trim()) return toast.error("Enter the customer's phone number.");
+    if (!phone.trim()) { toast.error("Enter the customer's phone number."); return; }
 
     setCollecting(true);
     try {

@@ -107,15 +107,15 @@ function TripsNewPage() {
     e.preventDefault();
 
     const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return toast.error("Your session has expired. Sign in again.");
-    if (!routeId) return toast.error("Select a route.");
-    if (!branchId) return toast.error("Select a branch.");
-    if (!departureDate || !departureTime) return toast.error("Set the departure date and time.");
-    if (!totalSeats || Number(totalSeats) <= 0) return toast.error("Enter the total seats.");
+    if (!user) { toast.error("Your session has expired. Sign in again."); return; }
+    if (!routeId) { toast.error("Select a route."); return; }
+    if (!branchId) { toast.error("Select a branch."); return; }
+    if (!departureDate || !departureTime) { toast.error("Set the departure date and time."); return; }
+    if (!totalSeats || Number(totalSeats) <= 0) { toast.error("Enter the total seats."); return; }
 
     // Combine local date + time into an ISO timestamp.
     const departure = new Date(`${departureDate}T${departureTime}`);
-    if (Number.isNaN(departure.getTime())) return toast.error("Invalid departure date/time.");
+    if (Number.isNaN(departure.getTime())) { toast.error("Invalid departure date/time."); return; }
 
     setSubmitting(true);
     const { error } = await supabase.from("trips").insert({
