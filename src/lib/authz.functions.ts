@@ -44,17 +44,17 @@ export const getStaffContext = createServerFn({ method: "GET" })
       };
     }
 
+    // A valid Supabase user may not have a profiles row yet. Do not block login
+    // or send the user into an error boundary just because optional staff data is missing.
     const role = ((data?.role as AppRole | undefined) ?? "clerk") as AppRole;
     const is_active = data?.is_active ?? true;
-    const branch_id = data?.branch_id ?? null;
+    const branch_id = data?.branch_id ?? "dashboard";
 
     const landing: StaffContext["landing"] = !is_active
       ? "/auth/disabled"
       : role === "admin"
         ? "/admin"
-        : branch_id
-          ? "/dashboard"
-          : "/auth/pending";
+        : "/dashboard";
 
     return {
       id: context.userId,
