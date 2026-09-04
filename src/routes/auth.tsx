@@ -39,8 +39,10 @@ function AuthPage() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      if (data.session) navigate({ to: "/dashboard", replace: true });
+    supabase.auth.getSession().then(async ({ data }) => {
+      if (!data.session) return;
+      const ctx = await getStaffContext();
+      navigate({ to: ctx.landing, replace: true });
     });
   }, [navigate]);
 
@@ -48,13 +50,17 @@ function AuthPage() {
     e.preventDefault();
     setLoading(true);
     const { error } = await supabase.auth.signInWithPassword({ email, password });
-    setLoading(false);
     if (error) {
+      setLoading(false);
       toast.error(error.message);
       return;
     }
-    navigate({ to: "/dashboard", replace: true });
+    // The destination is decided by the server from the stored profile.
+    const ctx = await getStaffContext();
+    setLoading(false);
+    navigate({ to: ctx.landing, replace: true });
   }
+
 
   async function handleSignUp(e: React.FormEvent) {
     e.preventDefault();
