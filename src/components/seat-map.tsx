@@ -1,20 +1,30 @@
-import { DoorOpen, LifeBuoy } from "lucide-react";
+import { DoorOpen, LoaderPinwheel, UserRound } from "lucide-react";
 
-export type SeatState = "available" | "booked" | "selected" | "blocked";
+export type SeatState = "available" | "booked" | "selected" | "blocked" | "staff";
 
 /**
- * Builds a realistic coach layout from the bus capacity:
- * rows of 4 (2 + aisle + 2) and, where the capacity allows it, a 5-seat back row.
+ * Builds a realistic coach layout from the bus capacity.
+ * - Capacity >= 20  → 2 + aisle + 2 rows with a 5-seat rear bench where it fits.
+ * - Smaller vehicles (shuttles) → 1 + aisle + 2 rows, matching a 11/14 seater.
  */
-export function buildSeatLayout(capacity: number): { rows: string[][]; backRow: string[] } {
+export function buildSeatLayout(capacity: number): {
+  rows: string[][];
+  backRow: string[];
+  perRow: number;
+  leftCount: number;
+} {
   const total = Math.max(0, Math.floor(capacity));
-  const hasBackRow = total >= 9 && (total - 5) % 4 === 0;
+  const isCoach = total >= 20;
+  const perRow = isCoach ? 4 : 3;
+  const leftCount = isCoach ? 2 : 1;
+
+  const hasBackRow = isCoach && total >= 9 && (total - 5) % perRow === 0;
   const frontCount = hasBackRow ? total - 5 : total;
 
   const rows: string[][] = [];
-  for (let i = 0; i < frontCount; i += 4) {
+  for (let i = 0; i < frontCount; i += perRow) {
     rows.push(
-      Array.from({ length: Math.min(4, frontCount - i) }, (_, j) => String(i + j + 1)),
+      Array.from({ length: Math.min(perRow, frontCount - i) }, (_, j) => String(i + j + 1)),
     );
   }
 
@@ -22,7 +32,7 @@ export function buildSeatLayout(capacity: number): { rows: string[][]; backRow: 
     ? Array.from({ length: 5 }, (_, i) => String(frontCount + i + 1))
     : [];
 
-  return { rows, backRow };
+  return { rows, backRow, perRow, leftCount };
 }
 
 const seatClass: Record<SeatState, string> = {
@@ -30,6 +40,7 @@ const seatClass: Record<SeatState, string> = {
   booked: "bg-seat-booked text-seat-booked-foreground cursor-not-allowed",
   selected: "bg-seat-selected text-seat-selected-foreground",
   blocked: "bg-seat-blocked text-seat-blocked-foreground cursor-not-allowed",
+  staff: "bg-primary text-primary-foreground cursor-not-allowed",
 };
 
 /** An armchair-shaped seat: two armrests, a padded back and the seat number. */
@@ -75,12 +86,12 @@ function Seat({
   );
 }
 
-
 export function SeatLegend() {
   const items: { label: string; state: SeatState }[] = [
     { label: "Available", state: "available" },
     { label: "Booked", state: "booked" },
     { label: "Selected", state: "selected" },
+    { label: "Crew", state: "staff" },
     { label: "Unavailable", state: "blocked" },
   ];
   return (
@@ -99,6 +110,7 @@ export function SeatMap({
   capacity,
   taken,
   blocked,
+  staffSeats,
   selected,
   onSelect,
   plate,
@@ -106,20 +118,23 @@ export function SeatMap({
   capacity: number;
   taken: Set<string>;
   blocked?: Set<string> | undefined;
+  staffSeats?: Set<string> | undefined;
   selected?: string | undefined;
   onSelect?: ((seat: string) => void) | undefined;
   plate?: string | null | undefined;
 }) {
-  const { rows, backRow } = buildSeatLayout(capacity);
+  const { rows, backRow, leftCount } = buildSeatLayout(capacity);
 
   const stateOf = (seat: string): SeatState =>
     selected === seat
       ? "selected"
       : taken.has(seat)
         ? "booked"
-        : blocked?.has(seat)
-          ? "blocked"
-          : "available";
+        : staffSeats?.has(seat)
+          ? "staff"
+          : blocked?.has(seat)
+            ? "blocked"
+            : "available";
 
   return (
     <div className="space-y-4">
@@ -127,9 +142,9 @@ export function SeatMap({
         {/* Driver cabin */}
         <div className="mb-4 flex items-center justify-between gap-6 rounded-t-[2rem] border-b-2 border-dashed border-border bg-card px-4 py-3">
           <span className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
-            <CircleDot className="size-5" /> Driver
+            <LoaderPinwheel className="size-6 text-primary" /> Driver
           </span>
-          <span className="text-[11px] font-mono uppercase tracking-wide text-muted-foreground">
+          <span className="font-mono text-[11px] uppercase tracking-wide text-muted-foreground">
             {plate ?? "Coach"}
           </span>
           <span className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
@@ -141,7 +156,7 @@ export function SeatMap({
           {rows.map((row, idx) => (
             <div key={idx} className="flex items-center justify-center gap-2">
               <div className="flex gap-2">
-                {row.slice(0, 2).map((seat) => (
+                {row.slice(0, leftCount).map((seat) => (
                   <Seat key={seat} seat={seat} state={stateOf(seat)} onSelect={onSelect} />
                 ))}
               </div>
@@ -149,7 +164,7 @@ export function SeatMap({
                 {idx + 1}
               </span>
               <div className="flex gap-2">
-                {row.slice(2).map((seat) => (
+                {row.slice(leftCount).map((seat) => (
                   <Seat key={seat} seat={seat} state={stateOf(seat)} onSelect={onSelect} />
                 ))}
               </div>
@@ -166,7 +181,7 @@ export function SeatMap({
         </div>
 
         <div className="mt-4 flex items-center justify-center gap-2 rounded-b-[2rem] border-t-2 border-dashed border-border pt-3 text-[11px] text-muted-foreground">
-          <CircleUserRound className="size-4" /> Rear of bus
+          <UserRound className="size-4" /> Rear of bus
         </div>
       </div>
 
