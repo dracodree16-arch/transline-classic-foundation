@@ -21,7 +21,9 @@ import { useStaffSession } from "@/lib/session";
 
 export const Route = createFileRoute("/_authenticated/admin/staff/new")({
   beforeLoad: ({ context }) => {
-    if (context.profile.role !== "admin") throw redirect({ to: "/dashboard" });
+    if (!["admin", "super_admin", "administrator"].includes(String(context.profile.role))) {
+      throw redirect({ to: "/dashboard" });
+    }
   },
   head: () => ({
     meta: [
