@@ -45,12 +45,29 @@ function StaffNewPage() {
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [branchId, setBranchId] = useState("");
+  const [stationId, setStationId] = useState("");
   const [role, setRole] = useState<"admin" | "clerk">("clerk");
+
+  const { data: stations } = useQuery({
+    queryKey: ["stations"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("stations")
+        .select("id, name, code, branch_id")
+        .eq("is_active", true)
+        .order("name");
+      if (error) throw new Error(error.message);
+      return data ?? [];
+    },
+  });
 
   const { data: branches } = useQuery({
     queryKey: ["branches"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("branches").select("id, name, town").order("name");
+      const { data, error } = await supabase
+        .from("branches")
+        .select("id, name, town")
+        .order("name");
       if (error) throw new Error(error.message);
       return data ?? [];
     },
@@ -65,6 +82,7 @@ function StaffNewPage() {
           password,
           phone: phone.trim() || undefined,
           branch_id: branchId,
+          station_id: stationId || null,
           role,
         },
       }),
@@ -80,7 +98,9 @@ function StaffNewPage() {
     return (
       <Page title="Add Clerk" description="Main admin only.">
         <SectionCard title="Restricted">
-          <p className="text-sm text-muted-foreground">Only the main admin can create staff accounts.</p>
+          <p className="text-sm text-muted-foreground">
+            Only the main admin can create staff accounts.
+          </p>
         </SectionCard>
       </Page>
     );
@@ -102,11 +122,20 @@ function StaffNewPage() {
         >
           <div className="space-y-2">
             <Label>Full name</Label>
-            <Input value={fullName} onChange={(e) => setFullName(e.target.value)} placeholder="Full name" />
+            <Input
+              value={fullName}
+              onChange={(e) => setFullName(e.target.value)}
+              placeholder="Full name"
+            />
           </div>
           <div className="space-y-2">
             <Label>Work email</Label>
-            <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Work email" />
+            <Input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Work email"
+            />
           </div>
           <div className="space-y-2">
             <Label>Phone number</Label>
@@ -134,6 +163,23 @@ function StaffNewPage() {
                     {b.town ? ` — ${b.town}` : ""}
                   </SelectItem>
                 ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-2">
+            <Label>Station</Label>
+            <Select value={stationId} onValueChange={setStationId}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select station" />
+              </SelectTrigger>
+              <SelectContent>
+                {(stations ?? [])
+                  .filter((s) => !branchId || s.branch_id === branchId)
+                  .map((s) => (
+                    <SelectItem key={s.id} value={s.id}>
+                      {s.name} ({s.code})
+                    </SelectItem>
+                  ))}
               </SelectContent>
             </Select>
           </div>

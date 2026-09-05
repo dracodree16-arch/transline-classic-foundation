@@ -79,11 +79,19 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "Transline Classic | Transport Management System" },
-      { name: "description", content: "Internal transport management platform for Transline Classic — bookings, parcels, fleet, trips and finance across Kenya." },
+      {
+        name: "description",
+        content:
+          "Internal transport management platform for Transline Classic — bookings, parcels, fleet, trips and finance across Kenya.",
+      },
       { name: "author", content: "Transline Classic" },
       { property: "og:type", content: "website" },
       { property: "og:title", content: "Transline Classic | Transport Management System" },
-      { property: "og:description", content: "Bookings, parcels, fleet, trips and finance for Transline Classic branches across Kenya." },
+      {
+        property: "og:description",
+        content:
+          "Bookings, parcels, fleet, trips and finance for Transline Classic branches across Kenya.",
+      },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:site", content: "@Lovable" },
     ],
@@ -93,6 +101,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         href: appCss,
       },
       { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
+      { rel: "manifest", href: "/manifest.webmanifest" },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {

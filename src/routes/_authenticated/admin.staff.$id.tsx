@@ -47,6 +47,18 @@ function StaffIdPage() {
     queryFn: () => fetchStaff(),
     enabled: isAdmin,
   });
+  const { data: stations } = useQuery({
+    queryKey: ["stations"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("stations")
+        .select("id, name, code, branch_id")
+        .eq("is_active", true)
+        .order("name");
+      if (error) throw new Error(error.message);
+      return data ?? [];
+    },
+  });
   const { data: branches } = useQuery({
     queryKey: ["branches"],
     queryFn: async () => {
@@ -61,6 +73,7 @@ function StaffIdPage() {
   const [fullName, setFullName] = useState("");
   const [phone, setPhone] = useState("");
   const [branchId, setBranchId] = useState("");
+  const [stationId, setStationId] = useState("");
   const [role, setRole] = useState<"admin" | "clerk">("clerk");
   const [isActive, setIsActive] = useState(true);
 
@@ -69,6 +82,7 @@ function StaffIdPage() {
     setFullName(member.full_name ?? "");
     setPhone(member.phone ?? "");
     setBranchId(member.branch_id ?? "");
+    setStationId(member.station_id ?? "");
     setRole(member.role);
     setIsActive(member.is_active);
   }, [member?.id]);
@@ -81,6 +95,7 @@ function StaffIdPage() {
           full_name: fullName.trim(),
           phone: phone.trim() || null,
           branch_id: branchId || null,
+          station_id: stationId || null,
           role,
           is_active: isActive,
         },
@@ -96,14 +111,19 @@ function StaffIdPage() {
     return (
       <Page title="Staff" description="Main admin only.">
         <SectionCard title="Restricted">
-          <p className="text-sm text-muted-foreground">Only the main admin can manage staff accounts.</p>
+          <p className="text-sm text-muted-foreground">
+            Only the main admin can manage staff accounts.
+          </p>
         </SectionCard>
       </Page>
     );
   }
 
   return (
-    <Page title={member?.full_name ?? "Staff member"} description={member?.email ?? "Staff profile"}>
+    <Page
+      title={member?.full_name ?? "Staff member"}
+      description={member?.email ?? "Staff profile"}
+    >
       <SectionCard title="Account">
         {!member ? (
           <p className="text-sm text-muted-foreground">Loading staff record…</p>
@@ -135,6 +155,23 @@ function StaffIdPage() {
                       {b.name}
                     </SelectItem>
                   ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label>Station</Label>
+              <Select value={stationId} onValueChange={setStationId}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select station" />
+                </SelectTrigger>
+                <SelectContent>
+                  {(stations ?? [])
+                    .filter((s) => !branchId || s.branch_id === branchId)
+                    .map((s) => (
+                      <SelectItem key={s.id} value={s.id}>
+                        {s.name} ({s.code})
+                      </SelectItem>
+                    ))}
                 </SelectContent>
               </Select>
             </div>

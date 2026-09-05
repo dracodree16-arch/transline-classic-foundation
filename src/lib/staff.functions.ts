@@ -8,7 +8,9 @@ export const listStaff = createServerFn({ method: "GET" })
   .handler(async ({ context }) => {
     const { data, error } = await context.supabase
       .from("profiles")
-      .select("id, full_name, email, phone, role, is_active, branch_id, created_at, branches(name)")
+      .select(
+        "id, full_name, email, phone, role, is_active, branch_id, station_id, created_at, branches(name), stations(name)",
+      )
       .order("created_at", { ascending: false });
     if (error) throw new Error(error.message);
     return (data ?? []).map((r) => ({
@@ -19,6 +21,8 @@ export const listStaff = createServerFn({ method: "GET" })
       role: r.role as "admin" | "clerk",
       is_active: r.is_active,
       branch_id: r.branch_id ?? null,
+      station_id: (r as { station_id?: string | null }).station_id ?? null,
+      station_name: (r as { stations?: { name?: string } | null }).stations?.name ?? null,
       branch_name: (r as { branches?: { name?: string } | null }).branches?.name ?? null,
     }));
   });
@@ -33,6 +37,7 @@ export const createClerk = createServerFn({ method: "POST" })
         password: z.string().min(8),
         phone: z.string().optional(),
         branch_id: z.string().uuid(),
+        station_id: z.string().uuid().nullable().optional(),
         role: z.enum(["admin", "clerk"]).default("clerk"),
       })
       .parse(input),
@@ -55,6 +60,7 @@ export const createClerk = createServerFn({ method: "POST" })
         email: data.email,
         phone: data.phone ?? null,
         branch_id: data.branch_id,
+        station_id: data.station_id ?? null,
         role: data.role,
         is_active: true,
       },
@@ -82,6 +88,7 @@ export const updateStaff = createServerFn({ method: "POST" })
         full_name: z.string().min(2).optional(),
         phone: z.string().nullable().optional(),
         branch_id: z.string().uuid().nullable().optional(),
+        station_id: z.string().uuid().nullable().optional(),
         role: z.enum(["admin", "clerk"]).optional(),
         is_active: z.boolean().optional(),
       })
@@ -96,12 +103,14 @@ export const updateStaff = createServerFn({ method: "POST" })
       full_name?: string;
       phone?: string | null;
       branch_id?: string | null;
+      station_id?: string | null;
       role?: "admin" | "clerk";
       is_active?: boolean;
     } = {};
     if (data.full_name !== undefined) patch.full_name = data.full_name;
     if (data.phone !== undefined) patch.phone = data.phone;
     if (data.branch_id !== undefined) patch.branch_id = data.branch_id;
+    if (data.station_id !== undefined) patch.station_id = data.station_id;
     if (data.role !== undefined) patch.role = data.role;
     if (data.is_active !== undefined) patch.is_active = data.is_active;
 

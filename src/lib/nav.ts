@@ -22,7 +22,17 @@ export type NavItem = {
 };
 
 export const navItems: NavItem[] = [
-  { title: "Admin Console", url: "/admin", icon: ShieldCheck, adminOnly: true },
+  {
+    title: "Admin Console",
+    url: "/admin",
+    icon: ShieldCheck,
+    adminOnly: true,
+    children: [
+      { title: "Overview", url: "/admin" },
+      { title: "Stations", url: "/admin/stations" },
+      { title: "Station Report", url: "/admin/stations/reports" },
+    ],
+  },
   { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
   {
     title: "Bookings",
@@ -127,14 +137,46 @@ export const navItems: NavItem[] = [
 ];
 
 export const APP_ROLES = [
-  { value: "super_admin", label: "Super Admin", description: "Full system control, including security and configuration." },
-  { value: "administrator", label: "Administrator", description: "Manages branches, staff, fleet and operations." },
-  { value: "manager", label: "Manager", description: "Oversees branch performance, reports and approvals." },
-  { value: "booking_agent", label: "Booking Agent", description: "Sells tickets and manages passenger bookings." },
-  { value: "dispatcher", label: "Dispatcher", description: "Manages trips, manifests and bus dispatch." },
-  { value: "parcel_staff", label: "Parcel Staff", description: "Handles parcel booking, loading and delivery." },
-  { value: "finance_staff", label: "Finance Staff", description: "Handles cash, banking, expenses and reconciliation." },
-  { value: "branch_staff", label: "Branch Staff", description: "General branch operations with limited access." },
+  {
+    value: "super_admin",
+    label: "Super Admin",
+    description: "Full system control, including security and configuration.",
+  },
+  {
+    value: "administrator",
+    label: "Administrator",
+    description: "Manages branches, staff, fleet and operations.",
+  },
+  {
+    value: "manager",
+    label: "Manager",
+    description: "Oversees branch performance, reports and approvals.",
+  },
+  {
+    value: "booking_agent",
+    label: "Booking Agent",
+    description: "Sells tickets and manages passenger bookings.",
+  },
+  {
+    value: "dispatcher",
+    label: "Dispatcher",
+    description: "Manages trips, manifests and bus dispatch.",
+  },
+  {
+    value: "parcel_staff",
+    label: "Parcel Staff",
+    description: "Handles parcel booking, loading and delivery.",
+  },
+  {
+    value: "finance_staff",
+    label: "Finance Staff",
+    description: "Handles cash, banking, expenses and reconciliation.",
+  },
+  {
+    value: "branch_staff",
+    label: "Branch Staff",
+    description: "General branch operations with limited access.",
+  },
 ] as const;
 
 export const roleLabel = (role?: string | null) =>
@@ -145,8 +187,6 @@ export function visibleNavItems(role: "admin" | "clerk"): NavItem[] {
   return navItems
     .filter((item) => !item.adminOnly)
     .map((item) =>
-      item.children
-        ? { ...item, children: item.children.filter((c) => !c.adminOnly) }
-        : item,
+      item.children ? { ...item, children: item.children.filter((c) => !c.adminOnly) } : item,
     );
 }
