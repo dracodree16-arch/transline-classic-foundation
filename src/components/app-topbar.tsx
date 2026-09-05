@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { InstallAppButton } from "@/components/install-app-button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -30,7 +31,9 @@ export function AppTopbar({
 }) {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const [alerts, setAlerts] = useState<Array<{ id: string; title: string; message: string | null }>>([]);
+  const [alerts, setAlerts] = useState<
+    Array<{ id: string; title: string; message: string | null }>
+  >([]);
 
   useEffect(() => {
     let active = true;
@@ -73,16 +76,21 @@ export function AppTopbar({
         <Button variant="ghost" size="icon" className="md:hidden" aria-label="Search">
           <Search className="size-4" />
         </Button>
+        <InstallAppButton />
 
         <Popover>
           <PopoverTrigger asChild>
             <Button variant="ghost" size="icon" className="relative" aria-label="Notifications">
               <Bell className="size-4" />
-               {alerts.length > 0 && <span className="absolute right-1.5 top-1.5 size-2 rounded-full bg-destructive" />}
+              {alerts.length > 0 && (
+                <span className="absolute right-1.5 top-1.5 size-2 rounded-full bg-destructive" />
+              )}
             </Button>
           </PopoverTrigger>
           <PopoverContent align="end" className="w-80 p-0">
-            <div className="border-b border-border px-4 py-3 text-sm font-semibold">Notifications</div>
+            <div className="border-b border-border px-4 py-3 text-sm font-semibold">
+              Notifications
+            </div>
             <ul className="max-h-80 divide-y divide-border overflow-y-auto">
               {alerts.map((a) => (
                 <li key={a.id} className="px-4 py-3">
@@ -90,7 +98,9 @@ export function AppTopbar({
                   <p className="text-xs text-muted-foreground">{a.message}</p>
                 </li>
               ))}
-              {alerts.length === 0 && <li className="px-4 py-5 text-sm text-muted-foreground">No new notifications.</li>}
+              {alerts.length === 0 && (
+                <li className="px-4 py-5 text-sm text-muted-foreground">No new notifications.</li>
+              )}
             </ul>
           </PopoverContent>
         </Popover>
@@ -99,7 +109,9 @@ export function AppTopbar({
           <DropdownMenuTrigger asChild>
             <button className="flex items-center gap-2 rounded-xl px-2 py-1.5 transition-colors hover:bg-secondary">
               <Avatar className="size-8">
-                <AvatarFallback className="bg-primary text-xs text-primary-foreground">{initials}</AvatarFallback>
+                <AvatarFallback className="bg-primary text-xs text-primary-foreground">
+                  {initials}
+                </AvatarFallback>
               </Avatar>
               <span className="hidden text-left leading-tight sm:block">
                 <span className="block max-w-[160px] truncate text-sm font-medium">{email}</span>

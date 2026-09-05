@@ -1,0 +1,9 @@
+{
+  "name": "Transline Classic TMS",
+  "short_name": "Transline TMS",
+  "start_url": "/dashboard",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#0f172a",
+  "description": "Transline Classic transport management system"
+}

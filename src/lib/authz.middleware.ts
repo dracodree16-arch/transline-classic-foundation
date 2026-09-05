@@ -43,10 +43,11 @@ export const requireAuth = createMiddleware({ type: "function" })
       id: data.id,
       full_name: data.full_name ?? null,
       email: data.email ?? null,
-      role: (data.role as AppRole) ?? "clerk",
+      role: ["admin", "super_admin", "administrator"].includes(String(data.role))
+        ? "admin"
+        : "clerk",
       branch_id: data.branch_id ?? null,
-      branch_name:
-        (data as { branches?: { name?: string } | null }).branches?.name ?? null,
+      branch_name: (data as { branches?: { name?: string } | null }).branches?.name ?? null,
       is_active: data.is_active ?? true,
     };
 
@@ -94,7 +95,10 @@ export const requireAdminOrClerk = createMiddleware({ type: "function" })
  * clerks only for their own assigned branch. Returns the branch id that must
  * be used for the query (always server-derived for clerks).
  */
-export function requireBranchAccess(profile: AuthzProfile, branchId?: string | null): string | null {
+export function requireBranchAccess(
+  profile: AuthzProfile,
+  branchId?: string | null,
+): string | null {
   if (profile.role === "admin") return branchId ?? null;
   if (!profile.branch_id) throw new HttpError(403, "No branch assigned to this clerk");
   if (branchId && branchId !== profile.branch_id) {

@@ -44,7 +44,9 @@ export const getStaffContext = createServerFn({ method: "GET" })
       };
     }
 
-    const role = ((data?.role as AppRole | undefined) ?? "clerk") as AppRole;
+    const role: AppRole = ["admin", "super_admin", "administrator"].includes(String(data?.role))
+      ? "admin"
+      : "clerk";
     const is_active = data?.is_active ?? true;
     const branch_id = data?.branch_id ?? null;
 
@@ -62,8 +64,7 @@ export const getStaffContext = createServerFn({ method: "GET" })
       email: data?.email ?? null,
       role,
       branch_id,
-      branch_name:
-        (data as { branches?: { name?: string } | null } | null)?.branches?.name ?? null,
+      branch_name: (data as { branches?: { name?: string } | null } | null)?.branches?.name ?? null,
       is_active,
       landing,
     };

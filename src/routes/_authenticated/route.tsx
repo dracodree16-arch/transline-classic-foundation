@@ -22,7 +22,9 @@ export const Route = createFileRoute("/_authenticated")({
 
     if (profileError) throw profileError;
 
-    const role = profileRow?.role === "admin" ? "admin" : "clerk";
+    const role = ["admin", "super_admin", "administrator"].includes(String(profileRow?.role))
+      ? "admin"
+      : "clerk";
     const isActive = profileRow?.is_active ?? true;
     const branchId = profileRow?.branch_id ?? null;
     if (!isActive) {
@@ -31,7 +33,14 @@ export const Route = createFileRoute("/_authenticated")({
     }
     if (role === "clerk" && !branchId) throw redirect({ to: "/auth/pending" });
 
-    const adminOnlyPrefixes = ["/admin", "/finance", "/fleet", "/routes", "/staff", "/settings/system"];
+    const adminOnlyPrefixes = [
+      "/admin",
+      "/finance",
+      "/fleet",
+      "/routes",
+      "/staff",
+      "/settings/system",
+    ];
     if (role === "clerk" && adminOnlyPrefixes.some((p) => location.pathname.startsWith(p))) {
       throw redirect({ to: "/dashboard" });
     }
@@ -42,7 +51,8 @@ export const Route = createFileRoute("/_authenticated")({
       email: profileRow?.email ?? data.user.email ?? null,
       role,
       branch_id: branchId,
-      branch_name: (profileRow as { branches?: { name?: string } | null } | null)?.branches?.name ?? null,
+      branch_name:
+        (profileRow as { branches?: { name?: string } | null } | null)?.branches?.name ?? null,
       is_active: isActive,
     };
 
@@ -50,7 +60,6 @@ export const Route = createFileRoute("/_authenticated")({
   },
   component: AppLayout,
 });
-
 
 function AppLayout() {
   const { user, profile } = Route.useRouteContext();
