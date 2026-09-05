@@ -17,18 +17,22 @@ export function InstallAppButton() {
     window.addEventListener("beforeinstallprompt", handler);
     return () => window.removeEventListener("beforeinstallprompt", handler);
   }, []);
-  if (!event) return null;
   return (
     <Button
       variant="outline"
       size="sm"
       onClick={async () => {
+        if (!event) {
+          window.alert("App installation is not available in this browser. Open the browser menu and choose Add to Home screen or Install app.");
+          return;
+        }
         await event.prompt();
         await event.userChoice;
         setEvent(null);
       }}
+      aria-label="Download or install Transline Classic"
     >
-      <Download data-icon="inline-start" /> Install app
+      <Download data-icon="inline-start" /> Download app
     </Button>
   );
 }
