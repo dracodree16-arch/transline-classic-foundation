@@ -26,7 +26,7 @@ function RoutesIndexPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("routes")
-        .select("id, destination, base_fare, created_at, branches(name, town)")
+        .select("id, destination, base_fare, created_at, branches!routes_origin_branch_id_fkey(name, town)")
         .order("destination");
       if (error) throw new Error(error.message);
       return data ?? [];
