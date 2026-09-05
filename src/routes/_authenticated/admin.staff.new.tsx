@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
@@ -17,14 +17,7 @@ import {
 import { Page, SectionCard } from "@/components/page-shell";
 import { supabase } from "@/integrations/supabase/client";
 import { createClerk } from "@/lib/staff.functions";
-import { useStaffSession } from "@/lib/session";
-
 export const Route = createFileRoute("/_authenticated/admin/staff/new")({
-  beforeLoad: ({ context }) => {
-    if (!["admin", "super_admin", "administrator"].includes(String(context.profile.role))) {
-      throw redirect({ to: "/dashboard" });
-    }
-  },
   head: () => ({
     meta: [
       { title: "Add Clerk | Transline Classic TMS" },
@@ -37,7 +30,6 @@ export const Route = createFileRoute("/_authenticated/admin/staff/new")({
 });
 
 function StaffNewPage() {
-  const { isAdmin } = useStaffSession();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const addClerk = useServerFn(createClerk);
@@ -95,18 +87,6 @@ function StaffNewPage() {
     },
     onError: (e: Error) => toast.error(e.message),
   });
-
-  if (!isAdmin) {
-    return (
-      <Page title="Add Clerk" description="Main admin only.">
-        <SectionCard title="Restricted">
-          <p className="text-sm text-muted-foreground">
-            Only the main admin can create staff accounts.
-          </p>
-        </SectionCard>
-      </Page>
-    );
-  }
 
   return (
     <Page title="Add Clerk" description="Create a clerk account and assign a branch.">
