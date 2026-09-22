@@ -1,5 +1,5 @@
 import { CircleUserRound, DoorOpen } from "lucide-react";
-import { buildBusLayout } from "@/lib/seat-layout";
+import { useMemo } from "react";
 import { cn } from "@/lib/utils";
 
 interface SeatMapProps {
@@ -25,124 +25,101 @@ function LegendDot({
   );
 }
 
-function BusSeat({
+function Seat({
   number,
-  disabled,
-  reserved,
-  selected,
+  status,
+  onSelect,
 }: {
   number: string;
-  disabled: boolean;
-  reserved: boolean;
-  selected: boolean;
+  status: "available" | "taken" | "reserved" | "selected";
+  onSelect: () => void;
 }) {
-  const fill = selected
-    ? "fill-primary"
-    : reserved
-      ? "fill-accent"
-      : disabled
-        ? "fill-muted-foreground/55"
-        : "fill-card";
-
-  const arm = selected
-    ? "fill-primary-foreground/80"
-    : reserved
-      ? "fill-accent-foreground/80"
-      : disabled
-        ? "fill-muted-foreground/70"
-        : "fill-primary";
-
-  const stroke = selected
-    ? "stroke-primary"
-    : reserved
-      ? "stroke-accent"
-      : disabled
-        ? "stroke-muted-foreground/40"
-        : "stroke-primary";
-
-  const detail = selected
-    ? "fill-primary-foreground/20"
-    : reserved
-      ? "fill-accent-foreground/20"
-      : disabled
-        ? "fill-background/15"
-        : "fill-primary/10";
+  const disabled = status === "taken" || status === "reserved";
 
   return (
-    <span className="relative flex h-[62px] w-[62px] items-center justify-center sm:h-[68px] sm:w-[68px]">
-      <svg
-        viewBox="0 0 72 72"
-        aria-hidden="true"
-        className="absolute inset-0 h-full w-full"
-      >
-        {/* Backrest */}
-        <path
-          d="M19 7h34a6 6 0 0 1 6 6v23H13V13a6 6 0 0 1 6-6Z"
-          className={cn(fill, stroke)}
-          strokeWidth="2"
-        />
-
-        {/* Backrest inner padding */}
-        <path
-          d="M21 12h30a3 3 0 0 1 3 3v15H18V15a3 3 0 0 1 3-3Z"
-          className={detail}
-        />
-
-        {/* Seat cushion */}
-        <path
-          d="M16 34h40a7 7 0 0 1 7 7v8H9v-8a7 7 0 0 1 7-7Z"
-          className={cn(fill, stroke)}
-          strokeWidth="2"
-        />
-
-        {/* Cushion detail */}
-        <path
-          d="M17 39h38a3 3 0 0 1 3 3v3H14v-3a3 3 0 0 1 3-3Z"
-          className={detail}
-        />
-
-        {/* Left armrest */}
-        <path
-          d="M8 28h8v25H9a4 4 0 0 1-4-4V32a4 4 0 0 1 3-4Z"
-          className={arm}
-        />
-
-        {/* Right armrest */}
-        <path
-          d="M56 28h8a4 4 0 0 1 4 4v17a4 4 0 0 1-4 4h-7V28Z"
-          className={arm}
-        />
-
-        {/* Armrest highlights */}
-        <path
-          d="M9 32h3v16H9Zm51 0h3v16h-3Z"
-          className="fill-background/60"
-        />
-
-        {/* Cushion seam */}
-        <path
-          d="M18 47h36"
-          className="stroke-background/30"
-          strokeWidth="1.5"
-          strokeLinecap="round"
-        />
-      </svg>
-
+    <button
+      type="button"
+      disabled={disabled}
+      onClick={onSelect}
+      aria-label={`Seat ${number}`}
+      className={cn(
+        "group relative h-[58px] w-[48px] rounded-lg transition-all duration-150",
+        "focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2",
+        disabled && "cursor-not-allowed",
+        status === "available" &&
+          "bg-background hover:-translate-y-0.5 hover:shadow-md",
+        status === "taken" &&
+          "cursor-not-allowed bg-muted opacity-70",
+        status === "reserved" &&
+          "cursor-not-allowed bg-amber-100 opacity-80",
+        status === "selected" &&
+          "bg-primary text-primary-foreground shadow-md"
+      )}
+    >
+      {/* Seat back */}
       <span
         className={cn(
-          "relative z-10 mt-1 text-[10px] font-bold leading-none",
-          selected || reserved
-            ? "text-primary-foreground"
-            : "text-foreground",
-          disabled &&
-            !selected &&
-            !reserved &&
-            "text-background",
+          "absolute left-[7px] right-[7px] top-[4px] h-[25px] rounded-t-[8px] rounded-b-[5px] border-2",
+          status === "available" &&
+            "border-emerald-500 bg-emerald-50",
+          status === "taken" &&
+            "border-muted-foreground/40 bg-muted-foreground/20",
+          status === "reserved" &&
+            "border-amber-500 bg-amber-100",
+          status === "selected" &&
+            "border-primary-foreground/80 bg-primary"
+        )}
+      />
+
+      {/* Left armrest */}
+      <span
+        className={cn(
+          "absolute left-[2px] top-[29px] h-[17px] w-[7px] rounded-full border",
+          status === "available" && "border-emerald-500 bg-emerald-100",
+          status === "taken" && "border-muted-foreground/30 bg-muted-foreground/20",
+          status === "reserved" && "border-amber-500 bg-amber-200",
+          status === "selected" &&
+            "border-primary-foreground/70 bg-primary"
+        )}
+      />
+
+      {/* Right armrest */}
+      <span
+        className={cn(
+          "absolute right-[2px] top-[29px] h-[17px] w-[7px] rounded-full border",
+          status === "available" && "border-emerald-500 bg-emerald-100",
+          status === "taken" && "border-muted-foreground/30 bg-muted-foreground/20",
+          status === "reserved" && "border-amber-500 bg-amber-200",
+          status === "selected" &&
+            "border-primary-foreground/70 bg-primary"
+        )}
+      />
+
+      {/* Seat cushion */}
+      <span
+        className={cn(
+          "absolute bottom-[5px] left-[8px] right-[8px] h-[14px] rounded-md border",
+          status === "available" && "border-emerald-500 bg-emerald-200",
+          status === "taken" && "border-muted-foreground/30 bg-muted-foreground/20",
+          status === "reserved" && "border-amber-500 bg-amber-200",
+          status === "selected" &&
+            "border-primary-foreground/70 bg-primary"
+        )}
+      />
+
+      {/* Seat number */}
+      <span
+        className={cn(
+          "absolute inset-0 z-10 flex items-center justify-center pt-1 text-[11px] font-semibold",
+          status === "available" && "text-emerald-700",
+          status === "taken" && "text-muted-foreground",
+          status === "reserved" && "text-amber-800",
+          status === "selected" && "text-primary-foreground"
         )}
       >
         {number}
       </span>
-    </span>
+    </button>
   );
 }
 
@@ -153,22 +130,70 @@ export function SeatMap({
   selected,
   onSelect,
 }: SeatMapProps) {
-  const layout = buildBusLayout(capacity);
+  const seats = useMemo(() => {
+    const total = Math.max(0, capacity);
 
-  const takenSet = new Set(taken);
-  const reservedSet = new Set(reserved);
+    return Array.from({ length: total }, (_, index) => {
+      const number = String(index + 1);
+
+      let status: "available" | "taken" | "reserved" | "selected" =
+        "available";
+
+      if (taken.includes(number)) {
+        status = "taken";
+      } else if (reserved.includes(number)) {
+        status = "reserved";
+      }
+
+      if (selected === number) {
+        status = "selected";
+      }
+
+      return {
+        number,
+        status,
+      };
+    });
+  }, [capacity, taken, reserved, selected]);
+
+  /*
+   * Standard bus layout:
+   *
+   *  Driver
+   *
+   *  1  2     3  4
+   *  5  6     7  8
+   *  9 10    11 12
+   *
+   * The middle space represents the aisle.
+   */
+  const rows = useMemo(() => {
+    const result: Array<
+      Array<{
+        number: string;
+        status: "available" | "taken" | "reserved" | "selected";
+      } | null>
+    > = [];
+
+    for (let i = 0; i < seats.length; i += 4) {
+      result.push([
+        seats[i] ?? null,
+        seats[i + 1] ?? null,
+        seats[i + 2] ?? null,
+        seats[i + 3] ?? null,
+      ]);
+    }
+
+    return result;
+  }, [seats]);
 
   return (
-    <div className="space-y-4">
-      <div className="flex flex-wrap gap-x-5 gap-y-2">
+    <div className="w-full">
+      {/* Legend */}
+      <div className="mb-5 flex flex-wrap items-center justify-center gap-x-5 gap-y-2">
         <LegendDot
-          className="border-primary/70 bg-card"
+          className="border-emerald-500 bg-emerald-50"
           label="Available"
-        />
-
-        <LegendDot
-          className="border-muted-foreground/40 bg-muted"
-          label="Booked"
         />
 
         <LegendDot
@@ -177,92 +202,104 @@ export function SeatMap({
         />
 
         <LegendDot
-          className="border-accent bg-accent"
+          className="border-muted-foreground/40 bg-muted"
+          label="Booked"
+        />
+
+        <LegendDot
+          className="border-amber-500 bg-amber-100"
           label="Reserved"
         />
       </div>
 
-      <div className="mx-auto w-full max-w-sm rounded-[2.2rem] border-4 border-foreground/15 bg-secondary p-3 shadow-sm sm:max-w-md">
-        {/* Driver / door area */}
-        <div className="mb-3 flex items-center justify-between rounded-2xl bg-card px-3 py-2">
-          <span className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-            <CircleUserRound className="h-5 w-5 text-primary" />
-            Driver
-          </span>
+      {/* Bus body */}
+      <div className="mx-auto w-full max-w-[360px] rounded-[42px] border-2 border-border bg-muted/30 p-4 shadow-sm">
+        {/* Front / Driver */}
+        <div className="mb-6 rounded-2xl border border-border bg-background p-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
+              <CircleUserRound className="h-5 w-5" />
+              <span>Driver</span>
+            </div>
 
-          <span className="flex items-center gap-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-            Door
-            <DoorOpen className="h-5 w-5 text-primary" />
-          </span>
+            <DoorOpen className="h-5 w-5 text-muted-foreground" />
+          </div>
         </div>
 
         {/* Seats */}
-        <div className="space-y-1.5">
-          {layout.rows.map((row, rowIndex) => (
+        <div className="flex flex-col items-center gap-3">
+          {rows.map((row, rowIndex) => (
             <div
-              key={rowIndex}
-              className="grid items-center gap-1"
-              style={{
-                gridTemplateColumns: `repeat(${layout.columns}, minmax(0, 1fr))`,
-              }}
+              key={`row-${rowIndex}`}
+              className="flex items-center justify-center gap-2"
             >
-              {row.map((cell, cellIndex) => {
-                if (cell.kind === "aisle") {
-                  return (
+              {/* Left pair */}
+              <div className="flex gap-1">
+                {row.slice(0, 2).map((seat) =>
+                  seat ? (
+                    <Seat
+                      key={seat.number}
+                      number={seat.number}
+                      status={seat.status}
+                      onSelect={() => onSelect(seat.number)}
+                    />
+                  ) : (
                     <div
-                      key={cellIndex}
-                      className="min-h-[62px] sm:min-h-[68px]"
-                      aria-hidden
+                      key={`empty-${rowIndex}-${Math.random()}`}
+                      className="h-[58px] w-[48px]"
                     />
-                  );
-                }
+                  )
+                )}
+              </div>
 
-                if (cell.kind === "empty") {
-                  return (
+              {/* Aisle */}
+              <div className="w-5 shrink-0" />
+
+              {/* Right pair */}
+              <div className="flex gap-1">
+                {row.slice(2, 4).map((seat) =>
+                  seat ? (
+                    <Seat
+                      key={seat.number}
+                      number={seat.number}
+                      status={seat.status}
+                      onSelect={() => onSelect(seat.number)}
+                    />
+                  ) : (
                     <div
-                      key={cellIndex}
-                      className="min-h-[62px] sm:min-h-[68px]"
-                      aria-hidden
+                      key={`empty-right-${rowIndex}-${Math.random()}`}
+                      className="h-[58px] w-[48px]"
                     />
-                  );
-                }
-
-                const isTaken = takenSet.has(cell.number);
-                const isReserved = reservedSet.has(cell.number);
-                const isSelected = selected === cell.number;
-                const disabled = isTaken || isReserved;
-
-                return (
-                  <button
-                    key={cellIndex}
-                    type="button"
-                    disabled={disabled}
-                    aria-label={`Seat ${cell.number}${
-                      disabled ? " unavailable" : ""
-                    }`}
-                    aria-pressed={isSelected}
-                    onClick={() => onSelect(cell.number)}
-                    className={cn(
-                      "flex min-w-0 items-center justify-center rounded-xl outline-none transition-transform",
-                      "focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2",
-                      !disabled && "hover:scale-105 active:scale-95",
-                      disabled && "cursor-not-allowed",
-                    )}
-                  >
-                    <BusSeat
-                      number={cell.number}
-                      disabled={disabled}
-                      reserved={isReserved}
-                      selected={isSelected}
-                    />
-                  </button>
-                );
-              })}
+                  )
+                )}
+              </div>
             </div>
           ))}
         </div>
+
+        {/* Rear */}
+        <div className="mt-6 flex justify-center">
+          <div className="rounded-xl border border-border bg-background px-5 py-2 text-xs text-muted-foreground">
+            Rear
+          </div>
+        </div>
+      </div>
+
+      {/* Selected seat */}
+      <div className="mt-4 text-center">
+        {selected ? (
+          <p className="text-sm font-medium">
+            Selected seat:{" "}
+            <span className="text-primary">{selected}</span>
+          </p>
+        ) : (
+          <p className="text-sm text-muted-foreground">
+            Select a seat to continue
+          </p>
+        )}
       </div>
     </div>
   );
 }
-  
+
+export default SeatMap;
