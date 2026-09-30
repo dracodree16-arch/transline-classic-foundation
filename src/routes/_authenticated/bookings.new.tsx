@@ -14,7 +14,9 @@ import { toast } from "sonner";
 import { Page, SectionCard } from "@/components/page-shell";
 import { supabase } from "@/integrations/supabase/client";
 import { SeatMap } from "@/components/seat-map";
+import { PrintTicket } from "@/components/print-ticket";
 import { initiateMpesaPayment } from "@/lib/mpesa";
+import { KES } from "@/lib/format";
 
 export const Route = createFileRoute("/_authenticated/bookings/new")({
   head: () => ({
@@ -54,6 +56,7 @@ function BookingsNewPage() {
   const [fare, setFare] = useState("");
   const [paymentMethod, setPaymentMethod] = useState<"cash" | "mpesa">("cash");
   const [submitting, setSubmitting] = useState(false);
+  const [bookedTicket, setBookedTicket] = useState<any | null>(null);
 
   useEffect(() => {
     let active = true;
@@ -199,6 +202,17 @@ function BookingsNewPage() {
     } else {
       toast.success(`Booking ${bookingRef} created — seat ${selectedSeat}`);
     }
+    setBookedTicket({
+      booking_ref: bookingRef,
+      passenger_name: passengerName.trim(),
+      passenger_phone: passengerPhone.trim(),
+      id_number: idNumber.trim() || null,
+      seat_number: selectedSeat,
+      fare_amount: Number(fare),
+      payment_status: paymentMethod === "cash" ? "paid" : "pending",
+      payment_method: paymentMethod,
+      trip: selectedTrip,
+    });
     setPassengerName("");
     setPassengerPhone("");
     setIdNumber("");
@@ -209,6 +223,31 @@ function BookingsNewPage() {
 
   return (
     <Page title="New Booking" description="Capture passenger details and issue a ticket.">
+      {bookedTicket && (
+        <SectionCard title="Booking ticket">
+          <PrintTicket
+            title="Passenger Travel Ticket"
+            subtitle={(bookedTicket.trip?.origin_town ?? "—") + " → " + (bookedTicket.trip?.destination ?? "—")}
+            reference={bookedTicket.booking_ref}
+            fields={[
+              { label: "Passenger", value: bookedTicket.passenger_name },
+              { label: "Phone", value: bookedTicket.passenger_phone },
+              { label: "ID number", value: bookedTicket.id_number ?? "—" },
+              { label: "Seat", value: bookedTicket.seat_number },
+              { label: "From", value: bookedTicket.trip?.origin_town ?? "—" },
+              { label: "Destination", value: bookedTicket.trip?.destination ?? "—" },
+              { label: "Departure", value: bookedTicket.trip?.departure_time ? new Date(bookedTicket.trip.departure_time).toLocaleString() : "—" },
+              { label: "Bus", value: bookedTicket.trip?.bus_plate ?? "—" },
+              { label: "Fare", value: KES(bookedTicket.fare_amount) },
+              { label: "Payment", value: bookedTicket.payment_status },
+              { label: "Payment method", value: bookedTicket.payment_method },
+            ]}
+            instructions="Keep this ticket and present it when boarding the bus."
+            footer="Transline Classic passenger travel ticket. Booking reference is the ticket reference."
+          />
+        </SectionCard>
+      )}
+
       <SectionCard title="Trip">
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-2">
