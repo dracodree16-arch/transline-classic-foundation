@@ -174,4 +174,28 @@
     -webkit-font-smoothing: antialiased;
   }
 }
-\n\n@media print {\n  body * { visibility: hidden !important; }\n  .print-ticket, .print-ticket * { visibility: visible !important; }\n  .print-ticket { position: absolute !important; left: 0 !important; top: 0 !important; width: 100% !important; box-shadow: none !important; border: 0 !important; }\n  @page { margin: 12mm; }\n}\n
+
+
+@media print {
+  body * {
+    visibility: hidden !important;
+  }
+
+  .print-ticket,
+  .print-ticket * {
+    visibility: visible !important;
+  }
+
+  .print-ticket {
+    position: absolute !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 100% !important;
+    box-shadow: none !important;
+    border: 0 !important;
+  }
+
+  @page {
+    margin: 12mm;
+  }
+}
