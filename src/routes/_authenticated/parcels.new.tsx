@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/select";
 import { toast } from "sonner";
 import { Page, SectionCard } from "@/components/page-shell";
+import { PrintTicket } from "@/components/print-ticket";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/_authenticated/parcels/new")({
@@ -30,7 +31,6 @@ export const Route = createFileRoute("/_authenticated/parcels/new")({
 type BranchOption = { id: string; name: string };
 
 function ParcelsNewPage() {
-  const navigate = useNavigate();
   const queryClient = useQueryClient();
 
   const [branches, setBranches] = useState<BranchOption[]>([]);
@@ -46,6 +46,7 @@ function ParcelsNewPage() {
   const [weight, setWeight] = useState("");
   const [charge, setCharge] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [bookedParcel, setBookedParcel] = useState<any | null>(null);
 
   useEffect(() => {
     let active = true;
@@ -101,11 +102,57 @@ function ParcelsNewPage() {
     }
     toast.success(`Parcel booked — tracking ${trackingCode}, access code ${accessPassword}`);
     await queryClient.invalidateQueries({ queryKey: ["parcels", "all"] });
-    navigate({ to: "/parcels" });
+    setBookedParcel({
+      tracking_code: trackingCode,
+      access_password: accessPassword,
+      sender_name: senderName.trim(),
+      sender_phone: senderPhone.trim(),
+      receiver_name: receiverName.trim(),
+      receiver_phone: receiverPhone.trim(),
+      origin: branches.find((b) => b.id === originBranchId),
+      destination: branches.find((b) => b.id === destinationBranchId),
+      description: description.trim() || null,
+      weight_kg: weight ? Number(weight) : null,
+      fare_amount: Number(charge),
+      payment_status: "pending",
+      status: "received",
+      created_at: new Date().toISOString(),
+    });
   }
 
   return (
     <Page title="Book Parcel" description="Register a parcel for transport between branches.">
+      {bookedParcel && (
+        <SectionCard title="Booking ticket">
+          <PrintTicket
+            title="Parcel Booking Ticket"
+            subtitle={(bookedParcel.origin?.name ?? "—") + " → " + (bookedParcel.destination?.name ?? "—")}
+            reference={bookedParcel.tracking_code}
+            fields={[
+              { label: "Sender", value: bookedParcel.sender_name },
+              { label: "Sender phone", value: bookedParcel.sender_phone },
+              { label: "Receiver", value: bookedParcel.receiver_name },
+              { label: "Receiver phone", value: bookedParcel.receiver_phone },
+              { label: "From", value: bookedParcel.origin?.name ?? "—" },
+              { label: "To", value: bookedParcel.destination?.name ?? "—" },
+              { label: "Description", value: bookedParcel.description ?? "—" },
+              { label: "Weight", value: bookedParcel.weight_kg != null ? bookedParcel.weight_kg + " kg" : "—" },
+              { label: "Charge", value: KES(bookedParcel.fare_amount) },
+              { label: "Payment", value: bookedParcel.payment_status },
+              { label: "Status", value: bookedParcel.status },
+              { label: "Parcel access code", value: bookedParcel.access_password },
+            ]}
+            instructions={
+              <>
+                <p>Use the tracking code and access code to track this parcel.</p>
+                <p className="mt-2 font-mono text-sm">Access code: {bookedParcel.access_password}</p>
+              </>
+            }
+            footer="Keep this booking ticket for parcel tracking and collection."
+          />
+        </SectionCard>
+      )}
+
       <SectionCard title="Parcel details">
         <form className="grid gap-4 sm:grid-cols-2" onSubmit={handleSubmit}>
           <div className="space-y-2">
