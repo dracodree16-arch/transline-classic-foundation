@@ -245,7 +245,6 @@ function BookingsNewPage() {
               taken={takenSeats}
               selected={selectedSeat || undefined}
               onSelect={setSelectedSeat}
-              plate={selectedTrip.bus_plate}
             />
           )}
           <p className="mt-2 text-xs text-muted-foreground">
