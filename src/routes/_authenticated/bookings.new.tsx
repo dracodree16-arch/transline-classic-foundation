@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -39,7 +39,7 @@ type TripOption = {
   base_fare: number | null;
 };
 
-function BookingsNewPage() {
+function BookingsNewPage() {\n  const navigate = useNavigate();
   const [trips, setTrips] = useState<TripOption[]>([]);
   const [loadingTrips, setLoadingTrips] = useState(true);
 
