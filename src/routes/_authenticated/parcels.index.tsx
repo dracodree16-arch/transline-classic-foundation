@@ -143,12 +143,18 @@ function ParcelsIndexPage() {
               { label: "Charge", value: KES(printParcel.fare_amount) },
               { label: "Payment", value: printParcel.payment_status ?? "pending" },
               { label: "Status", value: printParcel.status ?? "received" },
+              { label: "Parcel access code", value: printParcel.access_password ?? "—" },
               {
                 label: "Booked",
                 value: printParcel.created_at ? new Date(printParcel.created_at).toLocaleString() : "—",
               },
             ]}
-            instructions="Keep this tracking code for parcel collection and tracking."
+            instructions={
+              <>
+                <p>Keep the tracking code and access code safe for parcel tracking and collection.</p>
+                <p className="mt-2 font-mono text-sm">Access code: {printParcel.access_password ?? "—"}</p>
+              </>
+            }
             footer="Present this ticket when collecting the parcel. The tracking code is the parcel reference."
           />
         </div>
