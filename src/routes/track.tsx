@@ -5,7 +5,6 @@ import { Search, PackageCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/track")({
   head: () => ({
@@ -28,6 +27,7 @@ function PublicTrackingPage() {
     queryKey: ["public-parcel-tracking", searchedCode],
     enabled: Boolean(searchedCode),
     queryFn: async () => {
+      const { supabase } = await import("@/integrations/supabase/client");
       const { data, error } = await supabase.rpc("get_public_parcel_tracking", {
         _tracking_code: searchedCode,
       });
