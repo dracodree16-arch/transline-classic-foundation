@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
+import { Printer } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -124,14 +125,29 @@ function BookingsNewPage() {
     }
   }, [selectedTripId]);
 
-  async function handleSubmit(e: { preventDefault: () => void })  {
+  async function handleSubmit(e: { preventDefault: () => void }) {
     e.preventDefault();
 
-    if (!selectedTripId) { toast.error("Select a trip first."); return; }
-    if (!selectedSeat) { toast.error("Select a seat."); return; }
-    if (!passengerName.trim()) { toast.error("Passenger name is required."); return; }
-    if (!passengerPhone.trim()) { toast.error("Phone number is required."); return; }
-    if (!fare || Number(fare) <= 0) { toast.error("Enter a valid fare."); return; }
+    if (!selectedTripId) {
+      toast.error("Select a trip first.");
+      return;
+    }
+    if (!selectedSeat) {
+      toast.error("Select a seat.");
+      return;
+    }
+    if (!passengerName.trim()) {
+      toast.error("Passenger name is required.");
+      return;
+    }
+    if (!passengerPhone.trim()) {
+      toast.error("Phone number is required.");
+      return;
+    }
+    if (!fare || Number(fare) <= 0) {
+      toast.error("Enter a valid fare.");
+      return;
+    }
 
     setSubmitting(true);
 
@@ -149,7 +165,6 @@ function BookingsNewPage() {
       toast.error("Your account has no branch assigned. Contact an admin.");
       return;
     }
-
 
     const bookingRef = `BK${Date.now().toString(36).toUpperCase()}${Math.floor(Math.random() * 900 + 100)}`;
 
@@ -197,11 +212,16 @@ function BookingsNewPage() {
         const result = await initiateMpesaPayment(booking.id, passengerPhone.trim());
         toast.success(result.message);
       } catch (paymentError) {
-        toast.error(paymentError instanceof Error ? paymentError.message : "Failed to initiate M-Pesa payment.");
+        toast.error(
+          paymentError instanceof Error
+            ? paymentError.message
+            : "Failed to initiate M-Pesa payment."
+        );
       }
     } else {
       toast.success(`Booking ${bookingRef} created — seat ${selectedSeat}`);
     }
+
     setBookedTicket({
       booking_ref: bookingRef,
       passenger_name: passengerName.trim(),
@@ -213,6 +233,7 @@ function BookingsNewPage() {
       payment_method: paymentMethod,
       trip: selectedTrip,
     });
+
     setPassengerName("");
     setPassengerPhone("");
     setIdNumber("");
@@ -224,28 +245,58 @@ function BookingsNewPage() {
   return (
     <Page title="New Booking" description="Capture passenger details and issue a ticket.">
       {bookedTicket && (
-        <SectionCard title="Booking ticket">
-          <PrintTicket
-            title="Passenger Travel Ticket"
-            subtitle={(bookedTicket.trip?.origin_town ?? "—") + " → " + (bookedTicket.trip?.destination ?? "—")}
-            reference={bookedTicket.booking_ref}
-            fields={[
-              { label: "Passenger", value: bookedTicket.passenger_name },
-              { label: "Phone", value: bookedTicket.passenger_phone },
-              { label: "ID number", value: bookedTicket.id_number ?? "—" },
-              { label: "Seat", value: bookedTicket.seat_number },
-              { label: "From", value: bookedTicket.trip?.origin_town ?? "—" },
-              { label: "Destination", value: bookedTicket.trip?.destination ?? "—" },
-              { label: "Departure", value: bookedTicket.trip?.departure_time ? new Date(bookedTicket.trip.departure_time).toLocaleString() : "—" },
-              { label: "Bus", value: bookedTicket.trip?.bus_plate ?? "—" },
-              { label: "Fare", value: KES(bookedTicket.fare_amount) },
-              { label: "Payment", value: bookedTicket.payment_status },
-              { label: "Payment method", value: bookedTicket.payment_method },
-            ]}
-            instructions="Keep this ticket and present it when boarding the bus."
-            footer="Transline Classic passenger travel ticket. Booking reference is the ticket reference."
-          />
-        </SectionCard>
+        <>
+          <div className="mb-5 rounded-2xl border border-border bg-background p-4 shadow-sm">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <p className="text-sm font-semibold text-foreground">Booking completed</p>
+                <p className="text-sm text-muted-foreground">
+                  Ticket ready for {bookedTicket.passenger_name} · Ref {bookedTicket.booking_ref}
+                </p>
+              </div>
+              <Button
+                size="lg"
+                onClick={() => window.print()}
+                className="w-full sm:w-auto"
+              >
+                <Printer className="mr-2 size-5" />
+                Print Passenger Ticket
+              </Button>
+            </div>
+          </div>
+
+          <SectionCard title="Booking ticket">
+            <PrintTicket
+              title="Passenger Travel Ticket"
+              subtitle={
+                (bookedTicket.trip?.origin_town ?? "—") +
+                " → " +
+                (bookedTicket.trip?.destination ?? "—")
+              }
+              reference={bookedTicket.booking_ref}
+              fields={[
+                { label: "Passenger", value: bookedTicket.passenger_name },
+                { label: "Phone", value: bookedTicket.passenger_phone },
+                { label: "ID number", value: bookedTicket.id_number ?? "—" },
+                { label: "Seat", value: bookedTicket.seat_number },
+                { label: "From", value: bookedTicket.trip?.origin_town ?? "—" },
+                { label: "Destination", value: bookedTicket.trip?.destination ?? "—" },
+                {
+                  label: "Departure",
+                  value: bookedTicket.trip?.departure_time
+                    ? new Date(bookedTicket.trip.departure_time).toLocaleString()
+                    : "—",
+                },
+                { label: "Bus", value: bookedTicket.trip?.bus_plate ?? "—" },
+                { label: "Fare", value: KES(bookedTicket.fare_amount) },
+                { label: "Payment", value: bookedTicket.payment_status },
+                { label: "Payment method", value: bookedTicket.payment_method },
+              ]}
+              instructions="Keep this ticket and present it when boarding the bus."
+              footer="Transline Classic passenger travel ticket. Booking reference is the ticket reference."
+            />
+          </SectionCard>
+        </>
       )}
 
       <SectionCard title="Trip">
@@ -296,15 +347,27 @@ function BookingsNewPage() {
         <form className="grid gap-4 sm:grid-cols-2" onSubmit={handleSubmit}>
           <div className="space-y-2">
             <Label>Passenger name</Label>
-            <Input value={passengerName} onChange={(e) => setPassengerName(e.target.value)} placeholder="Passenger name" />
+            <Input
+              value={passengerName}
+              onChange={(e) => setPassengerName(e.target.value)}
+              placeholder="Passenger name"
+            />
           </div>
           <div className="space-y-2">
             <Label>Phone number</Label>
-            <Input value={passengerPhone} onChange={(e) => setPassengerPhone(e.target.value)} placeholder="Phone number" />
+            <Input
+              value={passengerPhone}
+              onChange={(e) => setPassengerPhone(e.target.value)}
+              placeholder="Phone number"
+            />
           </div>
           <div className="space-y-2">
             <Label>ID number</Label>
-            <Input value={idNumber} onChange={(e) => setIdNumber(e.target.value)} placeholder="ID number (optional)" />
+            <Input
+              value={idNumber}
+              onChange={(e) => setIdNumber(e.target.value)}
+              placeholder="ID number (optional)"
+            />
           </div>
           <div className="space-y-2">
             <Label>Seat number</Label>
@@ -312,12 +375,22 @@ function BookingsNewPage() {
           </div>
           <div className="space-y-2">
             <Label>Fare (KES)</Label>
-            <Input value={fare} onChange={(e) => setFare(e.target.value)} placeholder="Fare (KES)" type="number" />
+            <Input
+              value={fare}
+              onChange={(e) => setFare(e.target.value)}
+              placeholder="Fare (KES)"
+              type="number"
+            />
           </div>
           <div className="space-y-2">
             <Label>Payment method</Label>
-            <Select value={paymentMethod} onValueChange={(value) => setPaymentMethod(value as "cash" | "mpesa")}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
+            <Select
+              value={paymentMethod}
+              onValueChange={(value) => setPaymentMethod(value as "cash" | "mpesa")}
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
               <SelectContent>
                 <SelectItem value="cash">Cash</SelectItem>
                 <SelectItem value="mpesa">M-Pesa</SelectItem>
