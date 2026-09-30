@@ -1,15 +1,13 @@
-
 import { CircleUserRound, DoorOpen } from "lucide-react";
 import { useMemo } from "react";
 import { cn } from "@/lib/utils";
 
 interface SeatMapProps {
   capacity: number;
-  taken: Set<string> | string[];
+  taken: string[];
   reserved?: string[];
-  selected?: string | null;
+  selected: string | null;
   onSelect: (seat: string) => void;
-  plate?: string | null;
 }
 
 function LegendDot({
@@ -77,12 +75,9 @@ function Seat({
       <span
         className={cn(
           "absolute left-[2px] top-[29px] h-[17px] w-[7px] rounded-full border",
-          status === "available" &&
-            "border-emerald-500 bg-emerald-100",
-          status === "taken" &&
-            "border-muted-foreground/30 bg-muted-foreground/20",
-          status === "reserved" &&
-            "border-amber-500 bg-amber-200",
+          status === "available" && "border-emerald-500 bg-emerald-100",
+          status === "taken" && "border-muted-foreground/30 bg-muted-foreground/20",
+          status === "reserved" && "border-amber-500 bg-amber-200",
           status === "selected" &&
             "border-primary-foreground/70 bg-primary"
         )}
@@ -92,12 +87,9 @@ function Seat({
       <span
         className={cn(
           "absolute right-[2px] top-[29px] h-[17px] w-[7px] rounded-full border",
-          status === "available" &&
-            "border-emerald-500 bg-emerald-100",
-          status === "taken" &&
-            "border-muted-foreground/30 bg-muted-foreground/20",
-          status === "reserved" &&
-            "border-amber-500 bg-amber-200",
+          status === "available" && "border-emerald-500 bg-emerald-100",
+          status === "taken" && "border-muted-foreground/30 bg-muted-foreground/20",
+          status === "reserved" && "border-amber-500 bg-amber-200",
           status === "selected" &&
             "border-primary-foreground/70 bg-primary"
         )}
@@ -107,12 +99,9 @@ function Seat({
       <span
         className={cn(
           "absolute bottom-[5px] left-[8px] right-[8px] h-[14px] rounded-md border",
-          status === "available" &&
-            "border-emerald-500 bg-emerald-200",
-          status === "taken" &&
-            "border-muted-foreground/30 bg-muted-foreground/20",
-          status === "reserved" &&
-            "border-amber-500 bg-amber-200",
+          status === "available" && "border-emerald-500 bg-emerald-200",
+          status === "taken" && "border-muted-foreground/30 bg-muted-foreground/20",
+          status === "reserved" && "border-amber-500 bg-amber-200",
           status === "selected" &&
             "border-primary-foreground/70 bg-primary"
         )}
@@ -138,9 +127,8 @@ export function SeatMap({
   capacity,
   taken,
   reserved = [],
-  selected = null,
+  selected,
   onSelect,
-  plate,
 }: SeatMapProps) {
   const seats = useMemo(() => {
     const total = Math.max(0, capacity);
@@ -148,18 +136,10 @@ export function SeatMap({
     return Array.from({ length: total }, (_, index) => {
       const number = String(index + 1);
 
-      let status:
-        | "available"
-        | "taken"
-        | "reserved"
-        | "selected" = "available";
+      let status: "available" | "taken" | "reserved" | "selected" =
+        "available";
 
-      const isTaken =
-        taken instanceof Set
-          ? taken.has(number)
-          : taken.includes(number);
-
-      if (isTaken) {
+      if (taken.includes(number)) {
         status = "taken";
       } else if (reserved.includes(number)) {
         status = "reserved";
@@ -176,6 +156,17 @@ export function SeatMap({
     });
   }, [capacity, taken, reserved, selected]);
 
+  /*
+   * Standard bus layout:
+   *
+   *  Driver
+   *
+   *  1  2     3  4
+   *  5  6     7  8
+   *  9 10    11 12
+   *
+   * The middle space represents the aisle.
+   */
   const rows = useMemo(() => {
     const result: Array<
       Array<{
@@ -231,15 +222,7 @@ export function SeatMap({
               <span>Driver</span>
             </div>
 
-            <div className="flex items-center gap-2">
-              {plate && (
-                <span className="text-xs font-medium text-muted-foreground">
-                  {plate}
-                </span>
-              )}
-
-              <DoorOpen className="h-5 w-5 text-muted-foreground" />
-            </div>
+            <DoorOpen className="h-5 w-5 text-muted-foreground" />
           </div>
         </div>
 
@@ -250,9 +233,9 @@ export function SeatMap({
               key={`row-${rowIndex}`}
               className="flex items-center justify-center gap-2"
             >
-              {/* Left side */}
+              {/* Left pair */}
               <div className="flex gap-1">
-                {row.slice(0, 2).map((seat, seatIndex) =>
+                {row.slice(0, 2).map((seat) =>
                   seat ? (
                     <Seat
                       key={seat.number}
@@ -262,7 +245,7 @@ export function SeatMap({
                     />
                   ) : (
                     <div
-                      key={`empty-left-${rowIndex}-${seatIndex}`}
+                      key={`empty-${rowIndex}-${Math.random()}`}
                       className="h-[58px] w-[48px]"
                     />
                   )
@@ -272,9 +255,9 @@ export function SeatMap({
               {/* Aisle */}
               <div className="w-5 shrink-0" />
 
-              {/* Right side */}
+              {/* Right pair */}
               <div className="flex gap-1">
-                {row.slice(2, 4).map((seat, seatIndex) =>
+                {row.slice(2, 4).map((seat) =>
                   seat ? (
                     <Seat
                       key={seat.number}
@@ -284,7 +267,7 @@ export function SeatMap({
                     />
                   ) : (
                     <div
-                      key={`empty-right-${rowIndex}-${seatIndex}`}
+                      key={`empty-right-${rowIndex}-${Math.random()}`}
                       className="h-[58px] w-[48px]"
                     />
                   )
