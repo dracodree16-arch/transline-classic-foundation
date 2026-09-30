@@ -4,9 +4,9 @@ import { cn } from "@/lib/utils";
 
 interface SeatMapProps {
   capacity: number;
-  taken: string[];
+  taken: Set<string> | string[];
   reserved?: string[];
-  selected: string | null;
+  selected?: string | null;
   onSelect: (seat: string) => void;
 }
 
@@ -139,7 +139,7 @@ export function SeatMap({
       let status: "available" | "taken" | "reserved" | "selected" =
         "available";
 
-      if (taken.includes(number)) {
+      if (taken instanceof Set ? taken.has(number) : taken.includes(number)) {
         status = "taken";
       } else if (reserved.includes(number)) {
         status = "reserved";
