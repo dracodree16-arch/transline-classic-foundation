@@ -155,7 +155,7 @@ export function SeatMap({ capacity, taken, reserved = [], selected, onSelect, on
               <div
                 key={r}
                 className={cn("grid gap-x-1.5", row.bench && "mt-1 border-t-2 border-dashed border-border pt-2")}
-                style={{ gridTemplateColumns: row.bench ? `repeat(${row.cells.length}, minmax(0, 1fr))` : row.cells.map((t) => (t === "_" ? "2.5rem" : "auto")).join(" ") }}
+                style={{ gridTemplateColumns: row.bench ? `repeat(${row.cells.length}, minmax(0, 1fr))` : row.cells.map((t) => (t.token === "_" ? "2.5rem" : "auto")).join(" ") }}
               >
                 {row.cells.map((cell, c) => {
                   const key = `${r}-${c}`;
