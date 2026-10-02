@@ -12,6 +12,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "sonner";
+import { KES } from "@/lib/format";
 import { Page, SectionCard } from "@/components/page-shell";
 import { PrintTicket } from "@/components/print-ticket";
 import { supabase } from "@/integrations/supabase/client";

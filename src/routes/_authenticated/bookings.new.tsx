@@ -335,6 +335,9 @@ function BookingsNewPage() {
               taken={takenSeats}
               selected={selectedSeat || undefined}
               onSelect={setSelectedSeat}
+              onContinue={() =>
+                document.getElementById("passenger-details")?.scrollIntoView({ behavior: "smooth" })
+              }
             />
           )}
           <p className="mt-2 text-xs text-muted-foreground">
@@ -343,6 +346,7 @@ function BookingsNewPage() {
         </SectionCard>
       )}
 
+      <div id="passenger-details" className="scroll-mt-20" />
       <SectionCard title="Passenger">
         <form className="grid gap-4 sm:grid-cols-2" onSubmit={handleSubmit}>
           <div className="space-y-2">
