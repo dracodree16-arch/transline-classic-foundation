@@ -1,6 +1,9 @@
-import { CircleUserRound, DoorOpen } from "lucide-react";
-import { useMemo } from "react";
+import { useEffect, useMemo, useRef } from "react";
+import { ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+
+type SeatStatus = "available" | "taken" | "reserved" | "selected";
 
 interface SeatMapProps {
   capacity: number;
@@ -8,294 +11,222 @@ interface SeatMapProps {
   reserved?: string[];
   selected?: string | null;
   onSelect: (seat: string) => void;
+  onContinue?: () => void;
 }
 
-function LegendDot({
-  className,
-  label,
-}: {
-  className: string;
-  label: string;
-}) {
-  return (
-    <span className="flex items-center gap-2 text-xs text-muted-foreground">
-      <span className={cn("h-4 w-4 rounded-md border-2", className)} />
-      {label}
-    </span>
-  );
+/** A row cell: seat number, aisle, door or empty spacer. */
+type Cell = { kind: "seat"; n: number } | { kind: "aisle" } | { kind: "door" } | { kind: "empty" };
+
+const SEAT_W = "w-12 sm:w-14";
+const SEAT_H = "h-14 sm:h-16";
+
+/**
+ * Builds a top-down layout. Seat ids stay "1".."capacity" (stored format);
+ * only the label is zero-padded.
+ * - 33 seats: Kenyan/Isuzu 2+1 with front-right door and 4-seat rear bench.
+ * - Other capacities: 2+2 with front-right door and rear bench of 5.
+ */
+function buildLayout(capacity: number): { cols: number; aisleCol: number; rows: Cell[][]; bench: number[] } {
+  const total = Math.max(0, capacity);
+  let n = 1;
+  const next = () => ({ kind: "seat", n: n++ }) as Cell;
+
+  if (total === 33) {
+    const rows: Cell[][] = [];
+    rows.push([next(), next(), { kind: "aisle" }, next()]); // before door
+    rows.push([next(), next(), { kind: "aisle" }, { kind: "door" }]); // door gap
+    for (let r = 0; r < 8; r++) rows.push([next(), next(), { kind: "aisle" }, next()]);
+    const bench = [n, n + 1, n + 2, n + 3];
+    return { cols: 4, aisleCol: 2, rows, bench };
+  }
+
+  const benchSize = total >= 10 ? 5 : 0;
+  let remaining = total - benchSize;
+  const rows: Cell[][] = [];
+  const take = () => (remaining-- > 0 ? next() : ({ kind: "empty" } as Cell));
+  // door row: 2 seats left, door right
+  if (remaining > 0) rows.push([take(), take(), { kind: "aisle" }, { kind: "door" }, { kind: "empty" }]);
+  while (remaining > 0) rows.push([take(), take(), { kind: "aisle" }, take(), take()]);
+  const bench = Array.from({ length: benchSize }, (_, i) => n + i);
+  return { cols: 5, aisleCol: 2, rows, bench };
 }
 
-function Seat({
-  number,
-  status,
-  onSelect,
-}: {
-  number: string;
-  status: "available" | "taken" | "reserved" | "selected";
-  onSelect: () => void;
-}) {
+function Seat({ n, status, onSelect }: { n: number; status: SeatStatus; onSelect: () => void }) {
   const disabled = status === "taken" || status === "reserved";
-
+  const label = String(n).padStart(2, "0");
   return (
     <button
       type="button"
       disabled={disabled}
       onClick={onSelect}
-      aria-label={`Seat ${number}`}
+      data-seat={n}
+      aria-pressed={status === "selected"}
+      aria-label={`Seat ${label}, ${status === "taken" ? "occupied" : status === "reserved" ? "unavailable" : status}`}
       className={cn(
-        "group relative h-[58px] w-[48px] rounded-lg transition-all duration-150",
-        "focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2",
+        "group relative shrink-0 rounded-xl transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+        SEAT_W,
+        SEAT_H,
+        status === "available" && "hover:-translate-y-0.5 active:scale-95",
+        status === "selected" && "scale-105 animate-in zoom-in-95",
         disabled && "cursor-not-allowed",
-        status === "available" &&
-          "bg-background hover:-translate-y-0.5 hover:shadow-md",
-        status === "taken" &&
-          "cursor-not-allowed bg-muted opacity-70",
-        status === "reserved" &&
-          "cursor-not-allowed bg-amber-100 opacity-80",
-        status === "selected" &&
-          "bg-primary text-primary-foreground shadow-md"
       )}
     >
-      {/* Seat back */}
+      {/* Backrest (front-facing: backrest at the rear edge of the seat) */}
       <span
         className={cn(
-          "absolute left-[7px] right-[7px] top-[4px] h-[25px] rounded-t-[8px] rounded-b-[5px] border-2",
-          status === "available" &&
-            "border-emerald-500 bg-emerald-50",
-          status === "taken" &&
-            "border-muted-foreground/40 bg-muted-foreground/20",
-          status === "reserved" &&
-            "border-amber-500 bg-amber-100",
-          status === "selected" &&
-            "border-primary-foreground/80 bg-primary"
+          "absolute inset-x-1 bottom-0.5 h-3 rounded-b-lg rounded-t-sm border shadow-sm",
+          status === "available" && "border-seat-available bg-seat-available/70",
+          status === "selected" && "border-seat-selected bg-seat-selected",
+          status === "taken" && "border-seat-booked/40 bg-seat-booked/40",
+          status === "reserved" && "border-border bg-seat-blocked",
         )}
       />
-
-      {/* Left armrest */}
+      {/* Armrests */}
+      {["left-0", "right-0"].map((side) => (
+        <span
+          key={side}
+          className={cn(
+            "absolute top-3 bottom-2 w-1.5 rounded-full",
+            side,
+            status === "selected" ? "bg-seat-selected/80" : status === "available" ? "bg-seat-available/60" : "bg-muted-foreground/20",
+          )}
+        />
+      ))}
+      {/* Cushion */}
       <span
         className={cn(
-          "absolute left-[2px] top-[29px] h-[17px] w-[7px] rounded-full border",
-          status === "available" && "border-emerald-500 bg-emerald-100",
-          status === "taken" && "border-muted-foreground/30 bg-muted-foreground/20",
-          status === "reserved" && "border-amber-500 bg-amber-200",
-          status === "selected" &&
-            "border-primary-foreground/70 bg-primary"
-        )}
-      />
-
-      {/* Right armrest */}
-      <span
-        className={cn(
-          "absolute right-[2px] top-[29px] h-[17px] w-[7px] rounded-full border",
-          status === "available" && "border-emerald-500 bg-emerald-100",
-          status === "taken" && "border-muted-foreground/30 bg-muted-foreground/20",
-          status === "reserved" && "border-amber-500 bg-amber-200",
-          status === "selected" &&
-            "border-primary-foreground/70 bg-primary"
-        )}
-      />
-
-      {/* Seat cushion */}
-      <span
-        className={cn(
-          "absolute bottom-[5px] left-[8px] right-[8px] h-[14px] rounded-md border",
-          status === "available" && "border-emerald-500 bg-emerald-200",
-          status === "taken" && "border-muted-foreground/30 bg-muted-foreground/20",
-          status === "reserved" && "border-amber-500 bg-amber-200",
-          status === "selected" &&
-            "border-primary-foreground/70 bg-primary"
-        )}
-      />
-
-      {/* Seat number */}
-      <span
-        className={cn(
-          "absolute inset-0 z-10 flex items-center justify-center pt-1 text-[11px] font-semibold",
-          status === "available" && "text-emerald-700",
-          status === "taken" && "text-muted-foreground",
-          status === "reserved" && "text-amber-800",
-          status === "selected" && "text-primary-foreground"
+          "absolute inset-x-2 top-1 bottom-4 flex items-center justify-center rounded-lg border text-xs font-bold tabular-nums shadow-[inset_0_-2px_0_rgb(0_0_0/0.08)] transition-colors",
+          status === "available" && "border-seat-available bg-card text-foreground group-hover:bg-seat-available/15",
+          status === "selected" && "border-seat-selected bg-seat-selected text-seat-selected-foreground shadow-md",
+          status === "taken" && "border-seat-booked/40 bg-seat-booked/15 text-muted-foreground line-through",
+          status === "reserved" && "border-border bg-seat-blocked text-seat-blocked-foreground",
         )}
       >
-        {number}
+        {label}
       </span>
     </button>
   );
 }
 
-export function SeatMap({
-  capacity,
-  taken,
-  reserved = [],
-  selected,
-  onSelect,
-}: SeatMapProps) {
-  const seats = useMemo(() => {
-    const total = Math.max(0, capacity);
+function Legend() {
+  const items = [
+    { label: "Available", cls: "border-seat-available bg-card" },
+    { label: "Selected", cls: "border-seat-selected bg-seat-selected" },
+    { label: "Occupied", cls: "border-seat-booked/40 bg-seat-booked/15" },
+  ];
+  return (
+    <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2">
+      {items.map((i) => (
+        <span key={i.label} className="flex items-center gap-2 text-xs text-muted-foreground">
+          <span className={cn("size-4 rounded-md border-2", i.cls)} />
+          {i.label}
+        </span>
+      ))}
+    </div>
+  );
+}
 
-    return Array.from({ length: total }, (_, index) => {
-      const number = String(index + 1);
+export function SeatMap({ capacity, taken, reserved = [], selected, onSelect, onContinue }: SeatMapProps) {
+  const layout = useMemo(() => buildLayout(capacity), [capacity]);
+  const mapRef = useRef<HTMLDivElement>(null);
 
-      let status: "available" | "taken" | "reserved" | "selected" =
-        "available";
+  const statusOf = (n: number): SeatStatus => {
+    const id = String(n);
+    if (selected === id) return "selected";
+    if (taken instanceof Set ? taken.has(id) : taken.includes(id)) return "taken";
+    if (reserved.includes(id)) return "reserved";
+    return "available";
+  };
 
-      if (taken instanceof Set ? taken.has(number) : taken.includes(number)) {
-        status = "taken";
-      } else if (reserved.includes(number)) {
-        status = "reserved";
-      }
+  useEffect(() => {
+    if (!selected) return;
+    mapRef.current
+      ?.querySelector(`[data-seat="${selected}"]`)
+      ?.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
+  }, [selected]);
 
-      if (selected === number) {
-        status = "selected";
-      }
-
-      return {
-        number,
-        status,
-      };
-    });
-  }, [capacity, taken, reserved, selected]);
-
-  /*
-   * Standard bus layout:
-   *
-   *  Driver
-   *
-   *  1  2     3  4
-   *  5  6     7  8
-   *  9 10    11 12
-   *
-   * The middle space represents the aisle.
-   */
-  const rows = useMemo(() => {
-    const result: Array<
-      Array<{
-        number: string;
-        status: "available" | "taken" | "reserved" | "selected";
-      } | null>
-    > = [];
-
-    for (let i = 0; i < seats.length; i += 4) {
-      result.push([
-        seats[i] ?? null,
-        seats[i + 1] ?? null,
-        seats[i + 2] ?? null,
-        seats[i + 3] ?? null,
-      ]);
-    }
-
-    return result;
-  }, [seats]);
+  const gridCols = layout.cols === 4 ? "grid-cols-[auto_auto_2.5rem_auto]" : "grid-cols-[auto_auto_2.5rem_auto_auto]";
+  const selectedLabel = selected ? String(selected).padStart(2, "0") : null;
 
   return (
-    <div className="w-full">
-      {/* Legend */}
-      <div className="mb-5 flex flex-wrap items-center justify-center gap-x-5 gap-y-2">
-        <LegendDot
-          className="border-emerald-500 bg-emerald-50"
-          label="Available"
-        />
+    <div className="space-y-4">
+      <Legend />
 
-        <LegendDot
-          className="border-primary bg-primary"
-          label="Selected"
-        />
+      <div ref={mapRef} className="overflow-x-auto pb-2">
+        {/* Bus shell */}
+        <div className="relative mx-auto w-fit rounded-t-[3.5rem] rounded-b-[2rem] border-[3px] border-foreground/70 bg-secondary/50 p-3 shadow-[var(--shadow-card)] sm:p-4">
+          {/* Mirrors */}
+          <span className="absolute -left-2.5 top-10 h-6 w-2 rounded-l-md bg-foreground/60" aria-hidden />
+          <span className="absolute -right-2.5 top-10 h-6 w-2 rounded-r-md bg-foreground/60" aria-hidden />
 
-        <LegendDot
-          className="border-muted-foreground/40 bg-muted"
-          label="Booked"
-        />
+          <p className="mb-2 text-center text-[10px] font-bold uppercase tracking-[0.3em] text-muted-foreground">▲ Front</p>
 
-        <LegendDot
-          className="border-amber-500 bg-amber-100"
-          label="Reserved"
-        />
-      </div>
-
-      {/* Bus body */}
-      <div className="mx-auto w-full max-w-[360px] rounded-[42px] border-2 border-border bg-muted/30 p-4 shadow-sm">
-        {/* Front / Driver */}
-        <div className="mb-6 rounded-2xl border border-border bg-background p-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
-              <CircleUserRound className="h-5 w-5" />
-              <span>Driver</span>
-            </div>
-
-            <DoorOpen className="h-5 w-5 text-muted-foreground" />
-          </div>
-        </div>
-
-        {/* Seats */}
-        <div className="flex flex-col items-center gap-3">
-          {rows.map((row, rowIndex) => (
-            <div
-              key={`row-${rowIndex}`}
-              className="flex items-center justify-center gap-2"
-            >
-              {/* Left pair */}
-              <div className="flex gap-1">
-                {row.slice(0, 2).map((seat) =>
-                  seat ? (
-                    <Seat
-                      key={seat.number}
-                      number={seat.number}
-                      status={seat.status}
-                      onSelect={() => onSelect(seat.number)}
-                    />
-                  ) : (
-                    <div
-                      key={`empty-${rowIndex}-${Math.random()}`}
-                      className="h-[58px] w-[48px]"
-                    />
-                  )
-                )}
+          {/* Windscreen + dashboard */}
+          <div className="mb-3 rounded-t-[2.5rem] rounded-b-lg border-2 border-border bg-card px-3 pb-2 pt-3">
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex items-center gap-2">
+                <span className="relative flex size-9 items-center justify-center rounded-full border-[3px] border-foreground/70" aria-hidden>
+                  <span className="size-2 rounded-full bg-foreground/70" />
+                  <span className="absolute h-[3px] w-full bg-foreground/70" />
+                </span>
+                <span className="text-xs font-semibold text-muted-foreground">Driver</span>
               </div>
-
-              {/* Aisle */}
-              <div className="w-5 shrink-0" />
-
-              {/* Right pair */}
-              <div className="flex gap-1">
-                {row.slice(2, 4).map((seat) =>
-                  seat ? (
-                    <Seat
-                      key={seat.number}
-                      number={seat.number}
-                      status={seat.status}
-                      onSelect={() => onSelect(seat.number)}
-                    />
-                  ) : (
-                    <div
-                      key={`empty-right-${rowIndex}-${Math.random()}`}
-                      className="h-[58px] w-[48px]"
-                    />
-                  )
-                )}
-              </div>
+              <span className="text-[10px] uppercase tracking-wider text-muted-foreground">Dashboard</span>
             </div>
-          ))}
-        </div>
-
-        {/* Rear */}
-        <div className="mt-6 flex justify-center">
-          <div className="rounded-xl border border-border bg-background px-5 py-2 text-xs text-muted-foreground">
-            Rear
           </div>
+
+          {/* Seating deck */}
+          <div className={cn("grid gap-x-1.5 gap-y-2", gridCols)}>
+            {layout.rows.map((row, r) =>
+              row.map((cell, c) => {
+                const key = `${r}-${c}`;
+                if (cell.kind === "seat") return <Seat key={key} n={cell.n} status={statusOf(cell.n)} onSelect={() => onSelect(String(cell.n))} />;
+                if (cell.kind === "aisle")
+                  return <div key={key} className={cn(SEAT_H, "bg-muted/60 bg-[repeating-linear-gradient(0deg,transparent_0_6px,hsl(0_0%_50%/0.08)_6px_7px)]")} aria-hidden />;
+                if (cell.kind === "door")
+                  return (
+                    <div key={key} className={cn(SEAT_W, SEAT_H, "relative -mr-3 flex items-center justify-center sm:-mr-4")} aria-label="Entrance door">
+                      <span className="absolute inset-y-0 right-0 w-1.5 rounded-full bg-seat-available" />
+                      <span className="absolute inset-y-1 left-1 right-2 rounded-md border-2 border-dashed border-seat-available/70 bg-seat-available/10" />
+                      <span className="relative text-[10px] font-bold uppercase text-seat-available-foreground">Door</span>
+                    </div>
+                  );
+                return <div key={key} className={cn(SEAT_W, SEAT_H)} aria-hidden />;
+              }),
+            )}
+          </div>
+
+          {/* Rear bench */}
+          {layout.bench.length > 0 && (
+            <div className="mt-2 flex justify-between gap-1 rounded-b-2xl border-t-2 border-dashed border-border pt-2">
+              {layout.bench.map((n) => (
+                <Seat key={n} n={n} status={statusOf(n)} onSelect={() => onSelect(String(n))} />
+              ))}
+            </div>
+          )}
+
+          <p className="mt-3 text-center text-[10px] font-bold uppercase tracking-[0.3em] text-muted-foreground">Rear ▼</p>
         </div>
       </div>
 
-      {/* Selected seat */}
-      <div className="mt-4 text-center">
-        {selected ? (
-          <p className="text-sm font-medium">
-            Selected seat:{" "}
-            <span className="text-primary">{selected}</span>
+      {/* Sticky selection summary */}
+      <div className="sticky bottom-2 z-20 mx-auto flex max-w-md items-center justify-between gap-3 rounded-2xl border border-border bg-card/95 p-3 shadow-lg backdrop-blur">
+        <div className="min-w-0">
+          <p className="text-[11px] uppercase tracking-wider text-muted-foreground">Selected seats</p>
+          <p className="truncate text-sm font-semibold">
+            {selectedLabel ? (
+              <>
+                Seat <span className="text-seat-selected">{selectedLabel}</span> · 1 passenger
+              </>
+            ) : (
+              <span className="font-normal text-muted-foreground">Tap a seat to select</span>
+            )}
           </p>
-        ) : (
-          <p className="text-sm text-muted-foreground">
-            Select a seat to continue
-          </p>
+        </div>
+        {onContinue && (
+          <Button size="sm" disabled={!selected} onClick={onContinue}>
+            Continue <ArrowRight className="ml-1 size-4" />
+          </Button>
         )}
       </div>
     </div>
