@@ -125,13 +125,11 @@ export function resolveLayout(config: BusLayoutConfig): ResolvedLayout {
     const aisleAt = row.cells.indexOf("_");
     return {
       bench: !!row.bench,
-      cells: row.cells.map((token, ci) => ({
-        token,
-        seat:
-          token === "S"
-            ? make(ri + 1, row.bench || aisleAt < 0 ? "center" : ci < aisleAt ? "left" : "right", ci)
-            : undefined,
-      })),
+      cells: row.cells.map((token, ci) =>
+        token === "S"
+          ? { token, seat: make(ri + 1, row.bench || aisleAt < 0 ? "center" : ci < aisleAt ? "left" : "right", ci) }
+          : { token },
+      ),
     };
   });
   const columns = Math.max(1, ...config.rows.filter((x) => !x.bench).map((x) => x.cells.length));

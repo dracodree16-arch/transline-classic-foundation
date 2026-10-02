@@ -10,7 +10,7 @@ interface SeatMapProps {
   capacity: number;
   taken: Set<string> | string[];
   reserved?: string[];
-  selected?: string | null;
+  selected?: string | null | undefined;
   onSelect: (seat: string) => void;
   onContinue?: () => void;
 }
