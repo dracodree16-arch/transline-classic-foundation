@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef } from "react";
 import { ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { getBusLayout, resolveLayout } from "@/lib/bus-layouts";
 
 type SeatStatus = "available" | "taken" | "reserved" | "selected";
 
@@ -14,42 +15,8 @@ interface SeatMapProps {
   onContinue?: () => void;
 }
 
-/** A row cell: seat number, aisle, door or empty spacer. */
-type Cell = { kind: "seat"; n: number } | { kind: "aisle" } | { kind: "door" } | { kind: "empty" };
-
 const SEAT_W = "w-12 sm:w-14";
 const SEAT_H = "h-14 sm:h-16";
-
-/**
- * Builds a top-down layout. Seat ids stay "1".."capacity" (stored format);
- * only the label is zero-padded.
- * - 33 seats: Kenyan/Isuzu 2+1 with front-right door and 4-seat rear bench.
- * - Other capacities: 2+2 with front-right door and rear bench of 5.
- */
-function buildLayout(capacity: number): { cols: number; aisleCol: number; rows: Cell[][]; bench: number[] } {
-  const total = Math.max(0, capacity);
-  let n = 1;
-  const next = () => ({ kind: "seat", n: n++ }) as Cell;
-
-  if (total === 33) {
-    const rows: Cell[][] = [];
-    rows.push([next(), next(), { kind: "aisle" }, next()]); // before door
-    rows.push([next(), next(), { kind: "aisle" }, { kind: "door" }]); // door gap
-    for (let r = 0; r < 8; r++) rows.push([next(), next(), { kind: "aisle" }, next()]);
-    const bench = [n, n + 1, n + 2, n + 3];
-    return { cols: 4, aisleCol: 2, rows, bench };
-  }
-
-  const benchSize = total >= 10 ? 5 : 0;
-  let remaining = total - benchSize;
-  const rows: Cell[][] = [];
-  const take = () => (remaining-- > 0 ? next() : ({ kind: "empty" } as Cell));
-  // door row: 2 seats left, door right
-  if (remaining > 0) rows.push([take(), take(), { kind: "aisle" }, { kind: "door" }, { kind: "empty" }]);
-  while (remaining > 0) rows.push([take(), take(), { kind: "aisle" }, take(), take()]);
-  const bench = Array.from({ length: benchSize }, (_, i) => n + i);
-  return { cols: 5, aisleCol: 2, rows, bench };
-}
 
 function Seat({ n, status, onSelect }: { n: number; status: SeatStatus; onSelect: () => void }) {
   const disabled = status === "taken" || status === "reserved";
@@ -127,7 +94,7 @@ function Legend() {
 }
 
 export function SeatMap({ capacity, taken, reserved = [], selected, onSelect, onContinue }: SeatMapProps) {
-  const layout = useMemo(() => buildLayout(capacity), [capacity]);
+  const layout = useMemo(() => resolveLayout(getBusLayout(capacity)), [capacity]);
   const mapRef = useRef<HTMLDivElement>(null);
 
   const statusOf = (n: number): SeatStatus => {
@@ -145,7 +112,7 @@ export function SeatMap({ capacity, taken, reserved = [], selected, onSelect, on
       ?.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
   }, [selected]);
 
-  const gridCols = layout.cols === 4 ? "grid-cols-[auto_auto_2.5rem_auto]" : "grid-cols-[auto_auto_2.5rem_auto_auto]";
+  
   const selectedLabel = selected ? String(selected).padStart(2, "0") : null;
 
   return (
@@ -175,35 +142,39 @@ export function SeatMap({ capacity, taken, reserved = [], selected, onSelect, on
             </div>
           </div>
 
-          {/* Seating deck */}
-          <div className={cn("grid gap-x-1.5 gap-y-2", gridCols)}>
-            {layout.rows.map((row, r) =>
-              row.map((cell, c) => {
-                const key = `${r}-${c}`;
-                if (cell.kind === "seat") return <Seat key={key} n={cell.n} status={statusOf(cell.n)} onSelect={() => onSelect(String(cell.n))} />;
-                if (cell.kind === "aisle")
-                  return <div key={key} className={cn(SEAT_H, "bg-muted/60 bg-[repeating-linear-gradient(0deg,transparent_0_6px,hsl(0_0%_50%/0.08)_6px_7px)]")} aria-hidden />;
-                if (cell.kind === "door")
-                  return (
-                    <div key={key} className={cn(SEAT_W, SEAT_H, "relative -mr-3 flex items-center justify-center sm:-mr-4")} aria-label="Entrance door">
-                      <span className="absolute inset-y-0 right-0 w-1.5 rounded-full bg-seat-available" />
-                      <span className="absolute inset-y-1 left-1 right-2 rounded-md border-2 border-dashed border-seat-available/70 bg-seat-available/10" />
-                      <span className="relative text-[10px] font-bold uppercase text-seat-available-foreground">Door</span>
-                    </div>
-                  );
-                return <div key={key} className={cn(SEAT_W, SEAT_H)} aria-hidden />;
-              }),
-            )}
-          </div>
-
-          {/* Rear bench */}
-          {layout.bench.length > 0 && (
-            <div className="mt-2 flex justify-between gap-1 rounded-b-2xl border-t-2 border-dashed border-border pt-2">
-              {layout.bench.map((n) => (
-                <Seat key={n} n={n} status={statusOf(n)} onSelect={() => onSelect(String(n))} />
+          {layout.frontSeats.length > 0 && (
+            <div className="mb-3 flex gap-1.5 border-b-2 border-dashed border-border pb-3">
+              {layout.frontSeats.map((seat) => (
+                <Seat key={seat.id} n={seat.number} status={statusOf(seat.number)} onSelect={() => onSelect(seat.id)} />
               ))}
             </div>
           )}
+
+          <div className="flex flex-col gap-2">
+            {layout.rows.map((row, r) => (
+              <div
+                key={r}
+                className={cn("grid gap-x-1.5", row.bench && "mt-1 border-t-2 border-dashed border-border pt-2")}
+                style={{ gridTemplateColumns: row.bench ? `repeat(${row.cells.length}, minmax(0, 1fr))` : row.cells.map((t) => (t === "_" ? "2.5rem" : "auto")).join(" ") }}
+              >
+                {row.cells.map((cell, c) => {
+                  const key = `${r}-${c}`;
+                  if (cell.seat) return <Seat key={key} n={cell.seat.number} status={statusOf(cell.seat.number)} onSelect={() => onSelect(cell.seat!.id)} />;
+                  if (cell.token === "_")
+                    return <div key={key} className={cn(SEAT_H, "bg-muted/60")} aria-hidden />;
+                  if (cell.token === "D")
+                    return (
+                      <div key={key} className={cn(SEAT_W, SEAT_H, "relative flex items-center justify-center")} aria-label="Entrance door">
+                        <span className={cn("absolute inset-y-0 w-1.5 rounded-full bg-seat-available", c === 0 ? "-left-3 sm:-left-4" : "-right-3 sm:-right-4")} />
+                        <span className="absolute inset-1 rounded-md border-2 border-dashed border-seat-available/70 bg-seat-available/10" />
+                        <span className="relative text-[10px] font-bold uppercase text-seat-available-foreground">Door</span>
+                      </div>
+                    );
+                  return <div key={key} className={cn(SEAT_W, SEAT_H)} aria-hidden />;
+                })}
+              </div>
+            ))}
+          </div>
 
           <p className="mt-3 text-center text-[10px] font-bold uppercase tracking-[0.3em] text-muted-foreground">Rear ▼</p>
         </div>
